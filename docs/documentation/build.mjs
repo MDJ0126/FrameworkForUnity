@@ -153,10 +153,7 @@ await writeFile(resolve(root, pageFor(current.file)), `<!doctype html>
 const input = document.getElementById('search');
 const scripts = ${JSON.stringify(scripts).replaceAll('<', '\\u003c')};
 const safe = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-function underlineMatches(html, terms) {
-  const parts = html.split(/(<[^>]+>)/g);
-  const decode = text => text.replaceAll('&quot;', '"').replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&amp;', '&');
-  const plain = parts.filter(part => !part.startsWith('<')).map(decode).join('');
+function searchSelection(plain, terms) {
   const lower = plain.toLocaleLowerCase();
   const selected = Array(plain.length).fill(false);
   for (const term of terms) {
@@ -164,7 +161,26 @@ function underlineMatches(html, terms) {
     for (let start = lower.indexOf(term); start >= 0; start = lower.indexOf(term, start + 1)) {
       selected.fill(true, start, start + term.length);
     }
+    if (lower.includes(term) || !/^[a-z_][a-z0-9_]*$/i.test(term)) continue;
+    for (const identifier of plain.matchAll(/[a-z_][a-z0-9_]*/gi)) {
+      const positions = [];
+      let position = 0;
+      for (const character of term) {
+        const found = identifier[0].toLocaleLowerCase().indexOf(character, position);
+        if (found < 0) break;
+        positions.push(identifier.index + found);
+        position = found + 1;
+      }
+      if (positions.length === term.length) positions.forEach(index => { selected[index] = true; });
+    }
   }
+  return selected;
+}
+function underlineMatches(html, terms) {
+  const parts = html.split(/(<[^>]+>)/g);
+  const decode = text => text.replaceAll('&quot;', '"').replaceAll('&gt;', '>').replaceAll('&lt;', '<').replaceAll('&amp;', '&');
+  const plain = parts.filter(part => !part.startsWith('<')).map(decode).join('');
+  const selected = searchSelection(plain, terms);
   let offset = 0;
   return parts.map(part => {
     if (part.startsWith('<')) return part;
@@ -188,7 +204,7 @@ function showScript(id, preserveScroll = false) {
   const article = document.querySelector('article');
   article.id = 'script-view';
   const terms = input.value.toLocaleLowerCase().trim().split(/\\s+/).filter(Boolean);
-  article.innerHTML = '<h1>' + safe(script.name) + '</h1><p class="script-path">' + safe(script.path) + '</p><div class="code-label">C# · 읽기 전용 · 문서 빌드 시점의 소스</div><pre class="script-code"><code>' + script.source.replaceAll('\\r', '').split('\\n').map((line, index) => '<span class="code-row' + (terms.length && terms.some(term => line.toLocaleLowerCase().includes(term)) ? ' matched' : '') + '"><span class="line-number">' + (index + 1) + '</span><span>' + underlineMatches(script.highlighted[index], terms) + '</span></span>').join('') + '</code></pre>';
+  article.innerHTML = '<h1>' + safe(script.name) + '</h1><p class="script-path">' + safe(script.path) + '</p><div class="code-label">C# · 읽기 전용 · 문서 빌드 시점의 소스</div><pre class="script-code"><code>' + script.source.replaceAll('\\r', '').split('\\n').map((line, index) => '<span class="code-row' + (searchSelection(line, terms).some(Boolean) ? ' matched' : '') + '"><span class="line-number">' + (index + 1) + '</span><span>' + underlineMatches(script.highlighted[index], terms) + '</span></span>').join('') + '</code></pre>';
   document.querySelector('.breadcrumb').textContent = '프로젝트 다큐먼트 / 스크립트 / ' + script.path;
   document.querySelector('.pager').innerHTML = '';
   document.querySelectorAll('[data-chapter]').forEach(link => link.removeAttribute('aria-current'));
@@ -237,14 +253,25 @@ document.addEventListener('click', event => {
 window.addEventListener('hashchange', () => showChapter(location.hash.slice(1) || initialId));
 showChapter(location.hash.slice(1));
 const searchIndex = ${JSON.stringify(searchIndex).replaceAll('<', '\\u003c')};
+function matchesScriptName(name, term) {
+  const identifier = name.replace(/\\.cs$/i, '').toLocaleLowerCase();
+  let position = 0;
+  for (const character of term) {
+    const found = identifier.indexOf(character, position);
+    if (found < 0) return false;
+    position = found + 1;
+  }
+  return true;
+}
 input.addEventListener('input', () => {
   const terms = input.value.toLocaleLowerCase().trim().split(/\\s+/).filter(Boolean);
   const results = document.getElementById('script-results');
-  const matches = terms.length ? scripts.filter(script => terms.every(term => (script.path + '\\n' + script.source).toLocaleLowerCase().includes(term))) : [];
+  const matches = terms.length ? scripts.filter(script => terms.every(term => (script.path + '\\n' + script.source).toLocaleLowerCase().includes(term) || matchesScriptName(script.name, term))) : [];
+  matches.sort((a, b) => Number(terms.every(term => b.name.toLocaleLowerCase().includes(term))) - Number(terms.every(term => a.name.toLocaleLowerCase().includes(term))));
   results.hidden = !terms.length;
   results.innerHTML = '<h2 class="nav-group">스크립트 (' + matches.length + ')</h2>' + matches.map(script => {
     const lines = script.source.replaceAll('\\r', '').split('\\n');
-    const index = lines.findIndex(line => terms.some(term => line.toLocaleLowerCase().includes(term)));
+    const index = lines.findIndex(line => searchSelection(line, terms).some(Boolean));
     return '<a href="#' + script.id + '"><strong>' + safe(script.name) + '</strong><small>' + underlineMatches(safe(script.path), terms) + '</small>' + (index >= 0 ? '<small class="search-snippet">L' + (index + 1) + ': ' + underlineMatches(safe(lines[index].trim()), terms) + '</small>' : '') + '</a>';
   }).join('');
   let count = 0;

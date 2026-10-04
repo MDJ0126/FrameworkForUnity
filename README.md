@@ -11,12 +11,11 @@
 
 </div>
 
-> [!TIP]
-> **프로젝트를 살펴보거나 코드를 작성하실 때 다큐먼트를 이용해 주세요.**
->
-> 프로젝트 구조 · 다이어그램 · 작성 요령을 확인하고, C# 코드를 검색할 수 있습니다.
->
-> **[📖 프로젝트 다큐먼트 열기 →](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)** · [로컬 문서](docs/documentation/index.html)
+## Document
+
+프로젝트 구조, 다이어그램, 작성 요령 등을 안내합니다.
+
+[![프로젝트 다큐먼트](https://img.shields.io/badge/프로젝트_다큐먼트-WEB-2563EB?style=flat-square&logo=readthedocs&logoColor=white)](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)
 
 ## 소개
 

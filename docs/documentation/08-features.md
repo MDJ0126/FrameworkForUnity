@@ -13,9 +13,9 @@
 
 ## 현재 주의점
 
-- 스킬 등록·UpdateTick은 Execute를 자동 호출하지 않음.
-- SetHp는 대입 없음. HealSkill의 직접 hp 변경은 이벤트를 발행하지 않음.
-- HUD 부착 함수는 SetPawn을 호출하지 않음.
+- 스킬 등록·UpdateTick은 Execute를 자동 호출하지 않음. UseSkill로 실행.
+- SetHp는 체력을 대입하고 이벤트를 발행함. HealSkill의 직접 hp 변경은 이벤트를 발행하지 않음.
+- HUD 부착 시 SetPawn을 호출하여 이름·체력 데이터를 연결함.
 - 버프 종료 조건·순회 중 제거는 실행 검증 필요.
 - Socket, SkillObject, BuffSkill은 확장 뼈대.
 

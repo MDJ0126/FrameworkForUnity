@@ -14,6 +14,7 @@ GitHub: [MDJ0126/FrameworkForUnity](https://github.com/MDJ0126/FrameworkForUnity
 
 - **프로젝트 구조:** 폴더, 구현 기능, 환경.
 - **다이어그램:** 전체 프로세스(예정), 인게임 연결·캐릭터 구성, 아웃게임(예정).
+- **개발된 기능:** 캐릭터·플레이어 제어, HUD, 유틸리티·에디터.
 - **작성 요령:** Class·Struct·Enum·Function, Buff·Skill·HUD, 이벤트·주석.
 
 좌측 목차에서 원하는 문서를 선택합니다. 상단 로고를 누르면 프로젝트 소개로 돌아옵니다.

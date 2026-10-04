@@ -22,7 +22,7 @@ for (const file of markdown) {
   if ((html.match(/<article /g) || []).length !== 1) throw new Error(`Expected one document per page: ${page}`);
   if ((html.match(/<a [^>]*aria-current="page"/g) || []).length !== 1) throw new Error(`Current page marker: ${page}`);
   const categories = [...html.matchAll(/<h2 class="nav-group">([^<]+)<\/h2>/g)].map(match => match[1]);
-  if (categories.slice(0, 3).join(',') !== '프로젝트 구조,다이어그램,작성 요령') throw new Error(`Category order: ${page}`);
+  if (categories.slice(0, 4).join(',') !== '프로젝트 구조,다이어그램,개발된 기능,작성 요령') throw new Error(`Category order: ${page}`);
   for (const match of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) new Script(match[1]);
   // Check actual HTML attributes, excluding embedded script strings and styles.
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '').replace(/<style>[\s\S]*?<\/style>/g, '');

@@ -96,15 +96,16 @@ const scripts = await collectScripts(root);
 scripts.forEach(script => { script.highlighted = highlightCSharp(script.source); });
 const buildHash = createHash('sha256').update(JSON.stringify(chapters.map(c => [c.file, c.sourceHash]))).update(JSON.stringify(scripts.map(s => [s.path, s.hash]))).update(await readFile(fileURLToPath(import.meta.url))).update(await readFile(resolve(root, 'maintenance/csharp-highlight.mjs'))).digest('hex');
 const groups = [
-  ['프로젝트 구조', ['00', '01', '08', '09']],
+  ['프로젝트 구조', ['00', '01', '09']],
   ['다이어그램', ['21', '07', '22', '20']],
+  ['개발된 기능', ['08', '23', '24', '25']],
   ['작성 요령', ['12', '13', '18', '03', '02', '17', '19', '14', '15', '16', '04', '05', '06', '10', '11']],
 ];
 const grouped = new Set(groups.flatMap(([, prefixes]) => prefixes));
 const extra = chapters.filter(c => !grouped.has(c.file.slice(0, 2)));
 if (extra.length) groups.push(['추가 문서', extra.map(c => c.file.slice(0, 2))]);
 const ordered = groups.flatMap(([, prefixes]) => prefixes.flatMap(prefix => chapters.filter(c => c.file.slice(0, 2) === prefix)));
-const labels = { '00': '프로젝트 소개', '01': '폴더와 시스템 구조', '08': '구현 기능과 소스', '09': '환경과 라이선스', '07': '전체 연결', '02': '네이밍 컨벤션', '03': 'Function · 함수 작성', '04': 'Unity 작업 기본 규칙', '05': '예제 찾아보기 · 문서 양식', '06': '작업과 검증 절차', '10': '다큐먼트 갱신 매뉴얼', '11': '갱신 리비전과 이력', '12': 'Class · 클래스 작성', '13': 'Struct · 구조체 작성', '14': 'Buff 만들기', '15': 'Skill 만들기', '16': 'HUD 만들기', '17': '주석·줄바꿈 규칙', '18': 'Enum · 열거형 작성', '19': '이벤트 작성', '20': '예정', '21': '예정', '22': '캐릭터' };
+const labels = { '00': '프로젝트 소개', '01': '폴더와 시스템 구조', '08': '구현 기능과 소스', '09': '환경과 라이선스', '07': '전체 연결', '02': '네이밍 컨벤션', '03': 'Function · 함수 작성', '04': 'Unity 작업 기본 규칙', '05': '예제 찾아보기 · 문서 양식', '06': '작업과 검증 절차', '10': '다큐먼트 갱신 매뉴얼', '11': '갱신 리비전과 이력', '12': 'Class · 클래스 작성', '13': 'Struct · 구조체 작성', '14': 'Buff 만들기', '15': 'Skill 만들기', '16': 'HUD 만들기', '17': '주석·줄바꿈 규칙', '18': 'Enum · 열거형 작성', '19': '이벤트 작성', '20': '예정', '21': '예정', '22': '캐릭터', '23': '캐릭터 · 플레이어 제어', '24': 'HUD', '25': '유틸리티 · 에디터' };
 const writingSubgroups = [
   ['기본 작성', ['12', '13', '18', '03', '02', '17', '19']],
   ['기능별 작성', ['14', '15', '16']],

@@ -8,7 +8,7 @@ namespace Game
         public override void UpdateTick(float deltaTime)
         {
             base.UpdateTick(deltaTime);
-            owner.Status.hp += 10;
+            owner.StatusInfo.hp += 10;
         }
     }
 }

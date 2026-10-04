@@ -33,15 +33,16 @@ namespace Game
         /// <summary>
         /// 체력 변경 이벤트 호출 (현재 구현에서는 hp 필드를 직접 대입하지 않음)
         /// </summary>
-        public void SetHp(float hp)
+        public void SetHp(int hp)
         {
+            this.hp = hp;
             _onChangedHp?.Invoke(this);
         }
 
         /// <summary>
         /// 현재 체력에 지정 값을 더한 결과로 SetHp 호출
         /// </summary>
-        public void AddHp(float addHp)
+        public void AddHp(int addHp)
         {
             SetHp(hp + addHp);
         }
@@ -49,9 +50,9 @@ namespace Game
         /// <summary>
         /// 현재 체력에 전달받은 damage를 더한 결과로 SetHp 호출
         /// </summary>
-        public void Damaged(float damage)
+        public void Damaged(int damage)
         {
-            SetHp(hp + damage);
+            SetHp(hp - damage);
         }
     }
 }

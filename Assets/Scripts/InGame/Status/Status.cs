@@ -1,5 +1,6 @@
 namespace Game
 {
+    [System.Serializable]
     public struct Status
     {
         public int damage;

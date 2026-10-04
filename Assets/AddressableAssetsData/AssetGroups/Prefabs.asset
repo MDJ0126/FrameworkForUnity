@@ -30,6 +30,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c95072009d4a43a4c9ea85b541bd3ba4
+    m_Address: Assets/AddressablesResources/Datas/StatusTable.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 280ba4f61f1825b4c961a1a680e0c9a9, type: 2}
   m_SchemaSet:

@@ -1,10 +1,14 @@
+using System.Collections;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game
 {
     public class FollowPawnInfo : FollowHUD
     {
+        private const float GAUGE_ANIMATION_TIME = 0.2f;
+
         #region Inspector
 
         public TMP_Text nameText;
@@ -19,7 +23,7 @@ namespace Game
             base.OnDisable();
             if (_pawn)
             {
-                _pawn.Status.OnChangedHp -= OnChangedHp;
+                _pawn.StatusInfo.OnChangedHp -= OnChangedHp;
                 //_pawn.BaseStatus.OnChangedMp -= OnChangedMp;
             }
         }
@@ -33,10 +37,10 @@ namespace Game
 
             nameText.text = pawn.Name;
 
-            pawn.Status.OnChangedHp += OnChangedHp;
+            pawn.StatusInfo.OnChangedHp += OnChangedHp;
             //pawn.BaseStatus.OnChangedMp += OnChangedMp;
 
-            UpdateHpGauge((float)pawn.Status.hp / pawn.Status.baseStatus.maxHp);
+            UpdateHpGauge((float)pawn.StatusInfo.hp / pawn.StatusInfo.baseStatus.maxHp);
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace Game
         /// <param name="statusInfo"></param>
         private void OnChangedHp(StatusInfo statusInfo)
         {
-            UpdateHpGauge((float)statusInfo.hp / statusInfo.baseStatus.maxHp);
+            UpdateHpGauge(statusInfo.HpRatio);
         }
 
         /// <summary>
@@ -54,7 +58,30 @@ namespace Game
         /// <param name="value"></param>
         private void UpdateHpGauge(float value)
         {
-            fillImage.fillAmount = value;
+            if (this.gameObject.activeInHierarchy)
+            {
+                StartCoroutine(UpdateHpGaugeCo());
+            }
+            else
+            {
+                fillImage.fillAmount = value;
+            }
+
+            IEnumerator UpdateHpGaugeCo()
+            {
+                float start = fillImage.fillAmount;
+                float end = value;
+
+                float duration = 0f;
+                while (duration < GAUGE_ANIMATION_TIME)
+                {
+                    duration += Time.deltaTime;
+                    float t = duration / GAUGE_ANIMATION_TIME;
+                    fillImage.fillAmount = Mathf.Lerp(start, end, t);
+                    yield return null;
+                }
+                fillImage.fillAmount = end;
+            }
         }
     }
 }

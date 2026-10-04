@@ -83,6 +83,17 @@ namespace Game
             _owner.RobotKyleAnimationController.StartAttack();
         }
 
+        /// <summary>
+        /// 스킬1 입력 이벤트
+        /// </summary>
+        /// <param name="value"></param>
+        private void OnSkill1(InputValue value)
+        {
+            if (!_owner) return;
+
+            _owner.SkillManager.UseSkill(0);
+        }
+
         private void Update()
         {
             UpdateMoveInput();

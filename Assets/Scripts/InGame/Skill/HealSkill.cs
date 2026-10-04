@@ -7,7 +7,7 @@ namespace Game
         /// </summary>
         public override void Execute()
         {
-            owner.Status.hp += 10;
+            owner.StatusInfo.hp += 10;
         }
     }
 }

@@ -18,7 +18,10 @@ Get은 조회, Set은 변경, Add/Remove는 등록·제거, Try는 성공 여부
 public bool TryGetSkill(int index, out Skill skill)
 {
     skill = null;
-    if (index < 0 || index >= Skills.Count) return false;
+    if (index < 0 || index >= Skills.Count)
+    {
+        return false;
+    }
     skill = Skills[index];
     return true;
 }

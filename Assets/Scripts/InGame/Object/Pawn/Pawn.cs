@@ -5,6 +5,21 @@ namespace Game
 {
     public abstract class Pawn : BaseObject
     {
+        public delegate void OnDamagedEvent(Pawn attacker, Pawn target);
+        private event OnDamagedEvent _onDamaged = null;
+        public event OnDamagedEvent OnDamaged
+        {
+            add
+            {
+                _onDamaged -= value;
+                _onDamaged += value;
+            }
+            remove
+            {
+                _onDamaged -= value;
+            }
+        }
+
         #region Inspector
 
         public WidgetAnchor PawnInfoAnchor;
@@ -13,7 +28,7 @@ namespace Game
         #endregion
 
         public virtual string Name => nameof(Pawn);
-        public StatusInfo Status { get; private set; } = new();
+        public StatusInfo StatusInfo { get; private set; } = new();
         public SkillManager SkillManager { get; private set; } = new();
         public BuffManager BuffManager { get; private set; } = new();
         public Movement Movement { get; private set; }
@@ -59,10 +74,7 @@ namespace Game
         /// <summary>
         /// 최초 초기화
         /// </summary>
-        protected virtual void Initalize()
-        {
-
-        }
+        protected abstract void Initalize();
 
         /// <summary>
         /// 플레이어 컨트롤러 빙의 시 파생 Pawn에서 사용할 처리 지점
@@ -79,5 +91,23 @@ namespace Game
         {
 
         }
+
+        /// <summary>
+        /// 데미지를 받았을 때
+        /// </summary>
+        /// <param name="attacker">공격자</param>
+        /// <param damageInfo="attacker">데미지 정보</param>
+        public void Damaged(Pawn attacker, DamageInfo damageInfo)
+        {
+            DamagerProcess(attacker, damageInfo);
+            _onDamaged?.Invoke(attacker, this);
+        }
+
+        /// <summary>
+        /// 데미지 처리
+        /// </summary>
+        /// <param name="attacker">공격자</param>
+        /// <param damageInfo="attacker">데미지 정보</param>
+        protected abstract void DamagerProcess(Pawn attacker, DamageInfo damageInfo);
     }
 }

@@ -46,6 +46,19 @@ namespace Game
         }
 
         /// <summary>
+        /// 스킬 사용
+        /// </summary>
+        /// <param name="index"></param>
+        public void UseSkill(int index)
+        {
+            Skill skill = GetSkill(index);
+            if (skill != null)
+            {
+                skill.Execute();
+            }
+        }
+
+        /// <summary>
         /// 스킬 가져오기
         /// </summary>
         /// <param name="index">스킬 인덱스</param>

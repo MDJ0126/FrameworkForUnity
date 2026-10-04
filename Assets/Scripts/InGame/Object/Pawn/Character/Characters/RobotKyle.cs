@@ -17,5 +17,24 @@ namespace Game
             base.Awake();
             RobotKyleAnimationController = GetComponentInChildren<RobotKyleAnimationController>();
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            SkillManager.AddSkill(new RoarSkill());
+        }
+
+        protected override void Initalize()
+        {
+            Status status = StatusTable.Instance.GetData(0);
+            StatusInfo.baseStatus += status;
+            StatusInfo.Initialize();
+        }
+
+        protected override void DamagerProcess(Pawn attacker, DamageInfo damageInfo)
+        {
+            this.StatusInfo.Damaged(damageInfo.damage);
+            RobotKyleAnimationController.OnHitted();
+        }
     }
 }

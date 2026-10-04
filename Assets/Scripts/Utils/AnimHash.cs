@@ -10,4 +10,5 @@ public static class AnimHash
     public static int IsGrounded = Animator.StringToHash("IsGrounded");
     public static int Attack = Animator.StringToHash("Attack");
     public static int IsSprint = Animator.StringToHash("IsSprint");
+    public static int Hit = Animator.StringToHash("Hit");
 }

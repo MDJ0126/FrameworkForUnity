@@ -31,14 +31,12 @@ namespace Game
             }
         }
 
+        /// <summary>
+        /// 공격 처리
+        /// </summary>
         private void OnTakeDamage()
         {
-            Collider[] colliders = new Collider[10];
-            GameObject[] ignoreObjects = { _roboyKlye.gameObject };
-            PhysicsQueryHelper.OverlapSphereNonAlloc(_roboyKlye.Transform.position, 3f, colliders, LayerMask.GetMask("Pawn"), ignoreObjects: ignoreObjects, debug: new PhysicsQueryHelper.PhysicsQueryDebug
-            {
-                drawMode = PhysicsQueryHelper.eDebugDrawMode.ForDuration,
-            });
+
         }
 
         /// <summary>
@@ -48,6 +46,14 @@ namespace Game
         {
             IsAttacking = false;
             _roboyKlye.Movement.isMoveEnable = true;
+        }
+
+        /// <summary>
+        /// 피격 받음
+        /// </summary>
+        public void OnHitted()
+        {
+            boneAnimator.SetTrigger(AnimHash.Hit);
         }
     }
 }

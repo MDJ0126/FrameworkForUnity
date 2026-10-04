@@ -22,7 +22,11 @@ namespace Game
             IsAttacking = true;
             boneAnimator.SetTrigger("Attack");
             _roboyKlye.Movement.isMoveEnable = false;
-            _roboyKlye.Movement.StopMove();
+
+            if (_roboyKlye.Movement.IsGrounded)
+            {
+                _roboyKlye.Movement.StopMove();
+            }
         }
 
         /// <summary>

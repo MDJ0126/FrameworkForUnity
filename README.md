@@ -11,13 +11,12 @@
 
 </div>
 
-## 프로젝트 다큐먼트
-
-**[프로젝트 다큐먼트 사이트 바로가기 →](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)**
-
-프로젝트 구조, 다이어그램, 작성 요령과 C# 코드 검색을 확인하실 수 있습니다. 저장소를 내려받으면 [로컬 문서](docs/documentation/index.html)도 열 수 있습니다.
-
-현재 구현 범위는 [기능 목록](docs/documentation/08-features.md), 문서 관리 방법은 [갱신 매뉴얼](docs/documentation/10-updating.md)을 참고해 주세요.
+> [!TIP]
+> **프로젝트를 살펴보거나 코드를 작성하실 때 다큐먼트를 이용해 주세요.**
+>
+> 프로젝트 구조 · 다이어그램 · 작성 요령을 확인하고, C# 코드를 검색할 수 있습니다.
+>
+> **[📖 프로젝트 다큐먼트 열기 →](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)** · [로컬 문서](docs/documentation/index.html)
 
 ## 소개
 

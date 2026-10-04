@@ -247,6 +247,10 @@ document.addEventListener('click', event => {
   const view = views.find(view => view.page === link.getAttribute('href'));
   if (!view) return;
   event.preventDefault();
+  if (view.page === 'index.html') {
+    input.value = '';
+    updateSearch();
+  }
   showChapter(view.id);
   if (location.hash !== '#' + view.id) location.hash = '#' + view.id;
 });
@@ -263,7 +267,7 @@ function matchesScriptName(name, term) {
   }
   return true;
 }
-input.addEventListener('input', () => {
+function updateSearch() {
   const terms = input.value.toLocaleLowerCase().trim().split(/\\s+/).filter(Boolean);
   const results = document.getElementById('script-results');
   const matches = terms.length ? scripts.filter(script => terms.every(term => (script.path + '\\n' + script.source).toLocaleLowerCase().includes(term) || matchesScriptName(script.name, term))) : [];
@@ -304,7 +308,8 @@ input.addEventListener('input', () => {
     showScript(activeId, true);
     if (code) document.querySelector('.script-code').scrollLeft = scrollLeft;
   }
-});
+}
+input.addEventListener('input', updateSearch);
 </script><script src="vendor/mermaid.min.js"></script><script>
 async function renderDiagrams() {
   if (!window.mermaid) {

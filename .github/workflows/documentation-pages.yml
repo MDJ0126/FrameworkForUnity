@@ -1,0 +1,60 @@
+name: Deploy documentation to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'Assets/Scripts/**'
+      - 'README.md'
+      - 'NamingConvention.md'
+      - 'LICENSE'
+      - 'ProjectSettings/**'
+      - 'Packages/**'
+      - '.github/workflows/documentation-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: documentation-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build and verify documentation
+        run: |
+          node docs/documentation/build.mjs
+          node docs/documentation/maintenance/validate.mjs
+          node docs/documentation/maintenance/verify-navigation.mjs
+          node docs/documentation/maintenance/verify-highlight.mjs
+      - name: Prepare public site
+        run: |
+          node docs/documentation/maintenance/package-pages.mjs
+          node docs/documentation/maintenance/verify-navigation.mjs .pages-site/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .pages-site
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy documentation
+        id: deployment
+        uses: actions/deploy-pages@v4

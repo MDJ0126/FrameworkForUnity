@@ -34,7 +34,8 @@ namespace Game
         private void OnTakeDamage()
         {
             Collider[] colliders = new Collider[10];
-            PhysicsQueryHelper.OverlapSphereNonAlloc(_roboyKlye.Transform.position, 3f, colliders, debug: new PhysicsQueryHelper.PhysicsQueryDebug
+            GameObject[] ignoreObjects = { _roboyKlye.gameObject };
+            PhysicsQueryHelper.OverlapSphereNonAlloc(_roboyKlye.Transform.position, 3f, colliders, LayerMask.GetMask("Pawn"), ignoreObjects: ignoreObjects, debug: new PhysicsQueryHelper.PhysicsQueryDebug
             {
                 drawMode = PhysicsQueryHelper.eDebugDrawMode.ForDuration,
             });

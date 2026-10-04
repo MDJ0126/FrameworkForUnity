@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -27,8 +28,8 @@ public static class PhysicsQueryHelper
         [Tooltip("ForDuration 모드의 게임 시간(초). 0이면 한 프레임 표시한다.")]
         [Min(0f)] public float duration = 2f;
 
-        public Color color = Color.green;
-        public Color hitColor = Color.red;
+        public Color color = Color.red;
+        public Color hitColor = Color.green;
 
         [Tooltip("다른 물체에 가려진 선을 숨길지 설정한다.")]
         public bool depthTest = false;
@@ -40,10 +41,13 @@ public static class PhysicsQueryHelper
     /// <summary>
     /// 구 영역과 겹치는 콜라이더를 새 배열로 반환한다.
     /// </summary>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static Collider[] OverlapSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static Collider[] OverlapSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapSphere(center, radius, layerMask, triggerInteraction);
+        int count = FilterResults(result, result.Length, ignoreObjects);
+        if (count != result.Length) Array.Resize(ref result, count);
         DrawSphere(center, radius, debug, result.Length > 0);
         return result;
     }
@@ -51,12 +55,14 @@ public static class PhysicsQueryHelper
     /// <summary>
     /// 구 영역과 겹치는 콜라이더를 재사용 버퍼에 기록하고 개수를 반환한다.
     /// </summary>
-    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 버퍼가 가득 차면 일부 결과가 누락될 수 있다.</param>
+    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static int OverlapSphereNonAlloc(Vector3 center, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static int OverlapSphereNonAlloc(Vector3 center, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
         int result = Physics.OverlapSphereNonAlloc(center, radius, results, layerMask, triggerInteraction);
+        result = FilterResults(results, result, ignoreObjects);
         DrawSphere(center, radius, debug, result > 0);
         return result;
     }
@@ -66,10 +72,13 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="size">회전 전 각 축의 전체 크기. Transform의 스케일은 자동 적용하지 않는다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static Collider[] OverlapBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static Collider[] OverlapBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapBox(center, size * 0.5f, rotation ?? Quaternion.identity, layerMask, triggerInteraction);
+        int count = FilterResults(result, result.Length, ignoreObjects);
+        if (count != result.Length) Array.Resize(ref result, count);
         DrawBox(center, size, rotation ?? Quaternion.identity, debug, result.Length > 0);
         return result;
     }
@@ -78,13 +87,15 @@ public static class PhysicsQueryHelper
     /// 박스 영역과 겹치는 콜라이더를 재사용 버퍼에 기록하고 개수를 반환한다.
     /// </summary>
     /// <param name="size">회전 전 각 축의 전체 크기. Transform의 스케일은 자동 적용하지 않는다.</param>
-    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 버퍼가 가득 차면 일부 결과가 누락될 수 있다.</param>
+    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static int OverlapBoxNonAlloc(Vector3 center, Vector3 size, Collider[] results, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static int OverlapBoxNonAlloc(Vector3 center, Vector3 size, Collider[] results, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
         int result = Physics.OverlapBoxNonAlloc(center, size * 0.5f, results, rotation ?? Quaternion.identity, layerMask, triggerInteraction);
+        result = FilterResults(results, result, ignoreObjects);
         DrawBox(center, size, rotation ?? Quaternion.identity, debug, result > 0);
         return result;
     }
@@ -94,10 +105,13 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="point0">한쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static Collider[] OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static Collider[] OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapCapsule(point0, point1, radius, layerMask, triggerInteraction);
+        int count = FilterResults(result, result.Length, ignoreObjects);
+        if (count != result.Length) Array.Resize(ref result, count);
         DrawCapsule(point0, point1, radius, debug, result.Length > 0);
         return result;
     }
@@ -107,12 +121,14 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="point0">한쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
-    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 버퍼가 가득 차면 일부 결과가 누락될 수 있다.</param>
+    /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static int OverlapCapsuleNonAlloc(Vector3 point0, Vector3 point1, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    public static int OverlapCapsuleNonAlloc(Vector3 point0, Vector3 point1, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
         int result = Physics.OverlapCapsuleNonAlloc(point0, point1, radius, results, layerMask, triggerInteraction);
+        result = FilterResults(results, result, ignoreObjects);
         DrawCapsule(point0, point1, radius, debug, result > 0);
         return result;
     }
@@ -120,10 +136,14 @@ public static class PhysicsQueryHelper
     /// <summary>
     /// 구 영역과 겹치는 콜라이더가 하나라도 있는지 확인한다.
     /// </summary>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static bool CheckSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
+    public static bool CheckSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
-        bool result = Physics.CheckSphere(center, radius, layerMask, triggerInteraction);
+        bool result = ignoreObjects == null || ignoreObjects.Count == 0
+            ? Physics.CheckSphere(center, radius, layerMask, triggerInteraction)
+            : HasIncludedCollider(Physics.OverlapSphere(center, radius, layerMask, triggerInteraction), ignoreObjects);
         DrawSphere(center, radius, debug, result);
         return result;
     }
@@ -133,10 +153,14 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="size">회전 전 각 축의 전체 크기. Transform의 스케일은 자동 적용하지 않는다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static bool CheckBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
+    public static bool CheckBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
-        bool result = Physics.CheckBox(center, size * 0.5f, rotation ?? Quaternion.identity, layerMask, triggerInteraction);
+        bool result = ignoreObjects == null || ignoreObjects.Count == 0
+            ? Physics.CheckBox(center, size * 0.5f, rotation ?? Quaternion.identity, layerMask, triggerInteraction)
+            : HasIncludedCollider(Physics.OverlapBox(center, size * 0.5f, rotation ?? Quaternion.identity, layerMask, triggerInteraction), ignoreObjects);
         DrawBox(center, size, rotation ?? Quaternion.identity, debug, result);
         return result;
     }
@@ -146,10 +170,14 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="point0">한쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
+    /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
     /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
-    public static bool CheckCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, PhysicsQueryDebug debug = null)
+    /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
+    public static bool CheckCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
-        bool result = Physics.CheckCapsule(point0, point1, radius, layerMask, triggerInteraction);
+        bool result = ignoreObjects == null || ignoreObjects.Count == 0
+            ? Physics.CheckCapsule(point0, point1, radius, layerMask, triggerInteraction)
+            : HasIncludedCollider(Physics.OverlapCapsule(point0, point1, radius, layerMask, triggerInteraction), ignoreObjects);
         DrawCapsule(point0, point1, radius, debug, result);
         return result;
     }
@@ -161,6 +189,50 @@ public static class PhysicsQueryHelper
     {
         if (results == null) throw new System.ArgumentNullException(nameof(results));
         if (results.Length == 0) throw new System.ArgumentException("결과 버퍼에는 하나 이상의 공간이 필요합니다.", nameof(results));
+    }
+
+    /// <summary>
+    /// 제외 대상이 아닌 결과를 버퍼 앞쪽에 모으고 제거한 범위의 참조를 비운다.
+    /// </summary>
+    private static int FilterResults(Collider[] results, int count, IReadOnlyList<GameObject> ignoreObjects)
+    {
+        if (ignoreObjects == null || ignoreObjects.Count == 0) return count;
+        int includedCount = 0;
+        for (int i = 0; i < count; i++)
+        {
+            Collider collider = results[i];
+            if (collider == null || IsIgnored(collider, ignoreObjects)) continue;
+            results[includedCount++] = collider;
+        }
+
+        Array.Clear(results, includedCount, count - includedCount);
+        return includedCount;
+    }
+
+    /// <summary>
+    /// 제외 대상이 아닌 유효한 콜라이더가 하나라도 있는지 확인한다.
+    /// </summary>
+    private static bool HasIncludedCollider(Collider[] results, IReadOnlyList<GameObject> ignoreObjects)
+    {
+        for (int i = 0; i < results.Length; i++)
+        {
+            if (results[i] != null && !IsIgnored(results[i], ignoreObjects)) return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 콜라이더가 제외 오브젝트 자신 또는 그 자식에 속하는지 확인한다.
+    /// </summary>
+    private static bool IsIgnored(Collider collider, IReadOnlyList<GameObject> ignoreObjects)
+    {
+        Transform target = collider.transform;
+        for (int i = 0; i < ignoreObjects.Count; i++)
+        {
+            GameObject ignored = ignoreObjects[i];
+            if (ignored != null && target.IsChildOf(ignored.transform)) return true;
+        }
+        return false;
     }
 
     /// <summary>

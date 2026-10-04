@@ -28,7 +28,7 @@ node docs/documentation/maintenance/refresh.mjs status
 
 ## GitHub Pages 배포
 
-- 사이트: [프로젝트 다큐먼트](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html).
+- 사이트: [프로젝트 다큐먼트](https://mdj0126.github.io/SampleProjectForUnity/docs/documentation/index.html).
 - 저장소 Settings → Pages → Source를 **GitHub Actions**로 선택한다.
 - Deploy from a branch는 사용하지 않는다. 저장소의 오래된 HTML이 자동 생성 문서를 덮어쓸 수 있어 배포 전에 Source를 검사한다.
 - main에 문서·자체 소스·설정 변경을 push하면 빌드·검증·배포한다. Actions에서 수동 실행도 가능하다.

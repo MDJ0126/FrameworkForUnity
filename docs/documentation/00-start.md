@@ -1,21 +1,21 @@
 # 프로젝트 소개
 
-![Framework for Unity](../images/thumbnail.png)
+![Unity 샘플 프로젝트](../images/thumbnail.png)
 
-**게임 개발에 필요한 기능을 직접 만들고 쌓아가는 개인용 Unity 프레임워크**입니다.
+**게임 개발에 필요한 기능을 직접 만들고 쌓아가는 개인용 Unity 샘플 프로젝트**입니다.
 
 반복해서 사용하는 기능과 구조를 정리하고, 직접 구현하며 학습한 내용을 재사용 가능한 기반으로 만듭니다. 개인 프로젝트의 기반이자 코드 샘플·기술 검토 자료로 활용합니다.
 
 Unity 개발 패턴에 Unreal Engine의 장점을 접목하며, 시스템 재사용·기능 실험·개발 규칙 정리를 목표로 합니다.
 
-GitHub: [MDJ0126/FrameworkForUnity](https://github.com/MDJ0126/FrameworkForUnity)
+GitHub: [MDJ0126/SampleProjectForUnity](https://github.com/MDJ0126/SampleProjectForUnity)
 
 ## 다큐먼트 안내
 
-- **프로젝트 구조:** 폴더, 구현 기능, 환경.
-- **다이어그램:** 전체 프로세스(예정), 인게임 연결·캐릭터 구성, 아웃게임(예정).
-- **개발된 기능:** 캐릭터·플레이어 제어, HUD, 유틸리티·에디터.
-- **작성 요령:** Class·Struct·Enum·Function, Buff·Skill·HUD, 이벤트·주석.
+- **1. 프로젝트 구조:** 폴더, 구현 기능, 환경.
+- **2. 다이어그램:** 전체 프로세스(예정), 인게임 연결·캐릭터 구성, 아웃게임(예정).
+- **3. 개발된 기능:** 캐릭터·플레이어 제어, HUD, 유틸리티·에디터.
+- **4. 작성 요령:** Class·Struct·Enum·Function, Buff·Skill·HUD, 이벤트·주석.
 
 좌측 목차에서 원하는 문서를 선택합니다. 상단 로고를 누르면 프로젝트 소개로 돌아옵니다.
 

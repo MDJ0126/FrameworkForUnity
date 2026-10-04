@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const documents = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const project = resolve(documents, '../..');
 const output = resolve(project, '.pages-site');
-const repository = 'https://github.com/MDJ0126/FrameworkForUnity/blob/main/';
+const repository = 'https://github.com/MDJ0126/SampleProjectForUnity/blob/main/';
 
 // Delete only this dedicated generated directory inside the project.
 if (relative(project, output) !== '.pages-site') throw new Error('Invalid Pages output directory');

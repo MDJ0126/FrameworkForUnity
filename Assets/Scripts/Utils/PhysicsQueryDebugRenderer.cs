@@ -13,6 +13,49 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     private LineBatch _overlay;
     private LineBatch _depthTest;
 
+#if UNITY_EDITOR
+    /// <summary>
+    /// 저장하지 않는 디버그 객체가 플레이 종료와 스크립트 재로드를 넘어 남지 않도록 정리 이벤트를 연결한다.
+    /// </summary>
+    [UnityEditor.InitializeOnLoadMethod]
+    private static void InitializeEditorCleanup()
+    {
+        UnityEditor.EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+        UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        UnityEditor.AssemblyReloadEvents.beforeAssemblyReload -= DestroyEditorDebugObjects;
+        UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += DestroyEditorDebugObjects;
+        UnityEditor.EditorApplication.delayCall -= CleanupAfterReload;
+        UnityEditor.EditorApplication.delayCall += CleanupAfterReload;
+    }
+
+    private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
+    {
+        if (state == UnityEditor.PlayModeStateChange.ExitingPlayMode || state == UnityEditor.PlayModeStateChange.EnteredEditMode)
+            DestroyEditorDebugObjects();
+    }
+
+    private static void CleanupAfterReload()
+    {
+        if (!UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode) DestroyEditorDebugObjects();
+    }
+
+    /// <summary>
+    /// 재로드로 관리 참조가 사라진 기존 디버그 객체까지 찾아 즉시 제거한다.
+    /// </summary>
+    private static void DestroyEditorDebugObjects()
+    {
+        foreach (PhysicsQueryDebugRenderer instance in Resources.FindObjectsOfTypeAll<PhysicsQueryDebugRenderer>())
+        {
+            if (instance == null || UnityEditor.EditorUtility.IsPersistent(instance)) continue;
+            instance.DisposeResources(true);
+            DestroyImmediate(instance.gameObject);
+        }
+        _instance = null;
+        UnityEditor.SceneView.RepaintAll();
+        UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
+    }
+#endif
+
     /// <summary>
     /// 플레이 중 선분을 등록하고 필요한 렌더링 자원을 최초 호출에 생성한다.
     /// </summary>
@@ -50,13 +93,52 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     }
 
     /// <summary>
+    /// 갱신이 중단되어도 마지막 프레임의 선 메시가 계속 표시되지 않도록 비운다.
+    /// </summary>
+    private void OnDisable()
+    {
+        _overlay?.Clear();
+        _depthTest?.Clear();
+    }
+
+    /// <summary>
     /// 플레이 종료 시 생성한 메시와 머티리얼을 정리한다.
     /// </summary>
     private void OnDestroy()
     {
-        _overlay?.Dispose();
-        _depthTest?.Dispose();
+        DisposeResources(false);
         if (_instance == this) _instance = null;
+    }
+
+    /// <summary>
+    /// 소유한 자원을 해제하고 재로드 이전 메시와 머티리얼도 자식 렌더러 참조로 정리한다.
+    /// </summary>
+    private void DisposeResources(bool isImmediate)
+    {
+        _overlay?.Dispose(isImmediate);
+        _depthTest?.Dispose(isImmediate);
+        _overlay = null;
+        _depthTest = null;
+        foreach (MeshFilter filter in GetComponentsInChildren<MeshFilter>(true))
+        {
+            Mesh mesh = filter.sharedMesh;
+            filter.sharedMesh = null;
+            if (mesh != null && (mesh.hideFlags & HideFlags.DontSave) == HideFlags.DontSave) DestroyResource(mesh, isImmediate);
+        }
+        foreach (MeshRenderer renderer in GetComponentsInChildren<MeshRenderer>(true))
+        {
+            renderer.enabled = false;
+            Material material = renderer.sharedMaterial;
+            renderer.sharedMaterial = null;
+            if (material != null && (material.hideFlags & HideFlags.DontSave) == HideFlags.DontSave) DestroyResource(material, isImmediate);
+        }
+    }
+
+    private static void DestroyResource(Object resource, bool isImmediate)
+    {
+        if (resource == null) return;
+        if (isImmediate || !Application.isPlaying) DestroyImmediate(resource);
+        else Destroy(resource);
     }
 
     /// <summary>
@@ -162,10 +244,21 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
         /// <summary>
         /// 생성한 네이티브 렌더링 자원을 해제한다.
         /// </summary>
-        public void Dispose()
+        public void Dispose(bool isImmediate)
         {
-            Destroy(_mesh);
-            Destroy(_material);
+            Clear();
+            DestroyResource(_mesh, isImmediate);
+            DestroyResource(_material, isImmediate);
+        }
+
+        /// <summary>
+        /// 보관 중인 선을 제거하고 렌더러와 메시를 즉시 비운다.
+        /// </summary>
+        public void Clear()
+        {
+            _lines.Clear();
+            if (_renderer != null) _renderer.enabled = false;
+            if (_mesh != null) _mesh.Clear();
         }
     }
 }

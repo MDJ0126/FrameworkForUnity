@@ -22,7 +22,7 @@ namespace Game
             if (IsAttacking) return;
 
             IsAttacking = true;
-            boneAnimator.SetTrigger("Attack");
+            boneAnimator.SetTrigger(AnimHash.Attack);
             _roboyKlye.Movement.isMoveEnable = false;
 
             if (_roboyKlye.Movement.IsGrounded)

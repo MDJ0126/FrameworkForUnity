@@ -26,11 +26,11 @@ namespace Game
         /// </summary>
         private void Update()
         {
-            boneAnimator.SetFloat("Speed", _character.Movement.NormalizedHorizontalVelocity);
-            boneAnimator.SetBool("IsSprint", _character.Movement.IsSprint);
-            boneAnimator.SetBool("IsJumping", _movement.IsJumping);
-            boneAnimator.SetBool("IsFalling", _movement.IsFalling);
-            boneAnimator.SetBool("IsGrounded", _movement.IsGrounded);
+            boneAnimator.SetFloat(AnimHash.Speed, _character.Movement.NormalizedHorizontalVelocity);
+            boneAnimator.SetBool(AnimHash.IsSprint, _character.Movement.IsSprint);
+            boneAnimator.SetBool(AnimHash.IsJumping, _movement.IsJumping);
+            boneAnimator.SetBool(AnimHash.IsFalling, _movement.IsFalling);
+            boneAnimator.SetBool(AnimHash.IsGrounded, _movement.IsGrounded);
             UpdateMoveAnimation();
         }
 
@@ -52,8 +52,8 @@ namespace Game
             const float DAMP_TIME = 0.1f;
 
             // 급격한 방향 전환에도 블렌드 값이 튀지 않도록 댐핑한다.
-            boneAnimator.SetFloat("PosX", localDir.x, DAMP_TIME, Time.deltaTime);
-            boneAnimator.SetFloat("PosY", localDir.z, DAMP_TIME, Time.deltaTime);
+            boneAnimator.SetFloat(AnimHash.PosX, localDir.x, DAMP_TIME, Time.deltaTime);
+            boneAnimator.SetFloat(AnimHash.PosY, localDir.z, DAMP_TIME, Time.deltaTime);
         }
     }
 }

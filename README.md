@@ -11,13 +11,13 @@
 
 </div>
 
-## Document
+## 1. 프로젝트 문서
 
 프로젝트 구조, 다이어그램, 개발된 기능과 작성 요령은 아래 다큐먼트에서 확인하실 수 있습니다.
 
 [프로젝트 다큐먼트 보기](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)
 
-## 소개
+## 2. 소개
 
 프로젝트를 시작할 때 반복해서 사용하는 기능과 구조를 정리하고,  
 직접 구현하며 학습한 내용을 하나의 재사용 가능한 기반으로 만드는 프로젝트입니다.
@@ -31,7 +31,7 @@
 
 **프로젝트 파일 용량: 약 400MB**
 
-## 프레임워크 구조
+## 3. 프레임워크 구조
 
 전체 연결과 캐릭터 내부 구성을 나누어 표시합니다. 전체 연결도에는 시스템 사이의 주요 연결만, 캐릭터 상세도에는 보유하거나 참조하는 구성 요소를 나열합니다.
 
@@ -164,7 +164,7 @@ flowchart TB
 
 `GameMode`가 기본 `Pawn`의 빙의를 요청하면 `PlayerController`가 이동 입력, 조준 대상과 카메라를 연결합니다. 카메라는 캐릭터 하위의 `SpringArm`을 기준으로 움직이며, HUD는 `WidgetAnchor`를 추적하고 오브젝트 풀을 통해 재사용됩니다.
 
-## 개발된 기능
+## 4. 개발된 기능
 
 ### 캐릭터 · 플레이어 제어
 
@@ -201,6 +201,6 @@ flowchart TB
 - **카메라 핸들 · 빙의 단축키**: 씬 뷰 카메라 편집, 캐릭터 제어 테스트\
   [SpringArmEditor.cs](Assets/Scripts/Common/Editor/SpringArmEditor.cs), [EditorPossessInput.cs](Assets/Scripts/Common/EditorPossessInput.cs)
 
-## 프로젝트 환경
+## 5. 프로젝트 환경
 
 - **Unity Editor:** 6000.0.83f1

@@ -39,6 +39,7 @@ jobs:
         run: |
           node docs/documentation/maintenance/package-pages.mjs
           node docs/documentation/maintenance/verify-navigation.mjs .pages-site/index.html
+          node docs/documentation/maintenance/verify-navigation.mjs .pages-site/docs/documentation/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

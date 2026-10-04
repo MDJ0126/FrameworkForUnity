@@ -39,3 +39,12 @@ for (const name of (await readdir(output)).filter(name => name.endsWith('.html')
   }
 }
 console.log(`Prepared .pages-site; ${links} local links verified. Live deployment is not checked.`);
+
+// Keep the existing public documentation URL working after Actions deployment.
+const siteEntries = await readdir(output);
+const documentAlias = resolve(output, 'docs/documentation');
+await mkdir(documentAlias, { recursive: true });
+for (const name of siteEntries) {
+  await cp(resolve(output, name), resolve(documentAlias, name), { recursive: true });
+}
+await access(resolve(documentAlias, 'index.html'));

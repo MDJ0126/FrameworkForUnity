@@ -28,7 +28,7 @@ node docs/documentation/maintenance/refresh.mjs status
 
 ## GitHub Pages 배포
 
-- 사이트: [프로젝트 다큐먼트](https://mdj0126.github.io/FrameworkForUnity/).
+- 사이트: [프로젝트 다큐먼트](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html).
 - 저장소 Settings → Pages → Source를 **GitHub Actions**로 선택한다.
 - main에 문서·자체 소스·설정 변경을 push하면 빌드·검증·배포한다. Actions에서 수동 실행도 가능하다.
 - 검색 코드는 마지막 배포 시점의 소스다. 프로젝트 파일 링크는 GitHub에서 연다.

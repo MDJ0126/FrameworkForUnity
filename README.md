@@ -7,19 +7,19 @@
 ![Unity](https://img.shields.io/badge/Unity-6000.0.83f1-000000?style=flat-square&logo=unity&logoColor=white)
 ![Purpose](https://img.shields.io/badge/Purpose-Personal_Framework_%26_Code_Samples-6C63FF?style=flat-square)
 
-[![프로젝트 다큐먼트 열기](docs/images/documentation-button.svg)](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)
-
-프로젝트 구조 · 다이어그램 · 작성 요령 · C# 코드 검색을 웹에서 확인하실 수 있습니다.
-
 ![Framework for Unity](docs/images/thumbnail.png)
 
 </div>
 
-## 소개
+## 프로젝트 다큐먼트
 
-개발 규칙과 예제는 위 **프로젝트 다큐먼트 열기**에서 확인하실 수 있습니다. 저장소를 내려받으면 [HTML 다큐먼트](docs/documentation/index.html)를 로컬에서도 열 수 있습니다.
+**[프로젝트 다큐먼트 사이트 바로가기 →](https://mdj0126.github.io/FrameworkForUnity/docs/documentation/index.html)**
+
+프로젝트 구조, 다이어그램, 작성 요령과 C# 코드 검색을 확인하실 수 있습니다. 저장소를 내려받으면 [로컬 문서](docs/documentation/index.html)도 열 수 있습니다.
 
 현재 구현 범위는 [기능 목록](docs/documentation/08-features.md), 문서 관리 방법은 [갱신 매뉴얼](docs/documentation/10-updating.md)을 참고해 주세요.
+
+## 소개
 
 프로젝트를 시작할 때 반복해서 사용하는 기능과 구조를 정리하고,  
 직접 구현하며 학습한 내용을 하나의 재사용 가능한 기반으로 만드는 프로젝트입니다.

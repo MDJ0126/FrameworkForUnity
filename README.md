@@ -27,9 +27,7 @@
 
 기존 Unity 개발 경험을 통해 정립한 주요 패턴에 Unreal Engine의 장점을 접목해 개발하고 있습니다.
 
-[프로젝트 다운로드 (ZIP)](https://github.com/MDJ0126/FrameworkForUnity/archive/refs/heads/main.zip)
-
-**프로젝트 파일 용량: 약 400MB**
+[프로젝트 다운로드 (ZIP · 약 400MB)](https://github.com/MDJ0126/FrameworkForUnity/archive/refs/heads/main.zip)
 
 ## 3. 프레임워크 구조
 

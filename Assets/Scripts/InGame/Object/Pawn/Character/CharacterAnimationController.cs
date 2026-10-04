@@ -30,6 +30,7 @@ namespace Game
             boneAnimator.SetBool("IsSprint", _character.Movement.IsSprint);
             boneAnimator.SetBool("IsJumping", _movement.IsJumping);
             boneAnimator.SetBool("IsFalling", _movement.IsFalling);
+            boneAnimator.SetBool("IsGrounded", _movement.IsGrounded);
             UpdateMoveAnimation();
         }
 

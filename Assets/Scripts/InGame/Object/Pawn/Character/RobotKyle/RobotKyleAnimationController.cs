@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Game
 {
     public class RobotKyleAnimationController : CharacterAnimationController
@@ -27,6 +29,15 @@ namespace Game
             {
                 _roboyKlye.Movement.StopMove();
             }
+        }
+
+        private void OnTakeDamage()
+        {
+            Collider[] colliders = new Collider[10];
+            PhysicsQueryHelper.OverlapSphereNonAlloc(_roboyKlye.Transform.position, 3f, colliders, debug: new PhysicsQueryHelper.PhysicsQueryDebug
+            {
+                drawMode = PhysicsQueryHelper.eDebugDrawMode.ForDuration,
+            });
         }
 
         /// <summary>

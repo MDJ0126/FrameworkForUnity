@@ -13,11 +13,21 @@ for (const file of markdown) sources.push([file, createHash('sha256').update(awa
 const scripts = await collectScripts(root);
 const expectedHash = createHash('sha256').update(JSON.stringify(sources)).update(JSON.stringify(scripts.map(s => [s.path, s.hash]))).update(await readFile(resolve(root, 'build.mjs'))).update(await readFile(resolve(root, 'maintenance/csharp-highlight.mjs'))).digest('hex');
 let checkedLinks = 0;
+let buildTimestamp;
 for (const file of markdown) {
   const page = file === '00-start.md' ? 'index.html' : file.replace(/\.md$/, '.html');
   const source = await readFile(resolve(root, file), 'utf8');
   if (/^\s*\/\/\/\s*<summary>.+<\/summary>/m.test(source)) throw new Error(`One-line C# summary: ${file}`);
   const html = await readFile(resolve(root, page), 'utf8');
+  const timestamp = /<time datetime="([^"]+)">([^<]+)<\/time>/.exec(html);
+  if (!timestamp || Number.isNaN(Date.parse(timestamp[1]))) throw new Error(`Missing build timestamp: ${page}`);
+  const expectedTime = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  }).format(new Date(timestamp[1])) + ' KST (UTC+09:00)';
+  if (timestamp[2] !== expectedTime) throw new Error(`Incorrect Korean build time: ${page}`);
+  if (buildTimestamp && buildTimestamp !== timestamp[1]) throw new Error(`Inconsistent build time: ${page}`);
+  buildTimestamp = timestamp[1];
   if (!html.includes(`<meta name="documentation-build-hash" content="${expectedHash}">`)) throw new Error(`Stale output: ${page}. Run build.mjs before recording a revision.`);
   if ((html.match(/<article /g) || []).length !== 1) throw new Error(`Expected one document per page: ${page}`);
   if ((html.match(/<a [^>]*aria-current="page"/g) || []).length !== 1) throw new Error(`Current page marker: ${page}`);

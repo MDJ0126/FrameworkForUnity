@@ -38,11 +38,13 @@ public static class PhysicsQueryHelper
         [Range(8, 128)] public int segments = 32;
     }
 
+    private static readonly PhysicsQueryDebug _defaultDebug = new();
+
     /// <summary>
     /// 구 영역과 겹치는 콜라이더를 새 배열로 반환한다.
     /// </summary>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static Collider[] OverlapSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapSphere(center, radius, layerMask, triggerInteraction);
@@ -57,7 +59,7 @@ public static class PhysicsQueryHelper
     /// </summary>
     /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static int OverlapSphereNonAlloc(Vector3 center, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
@@ -73,7 +75,7 @@ public static class PhysicsQueryHelper
     /// <param name="size">회전 전 각 축의 전체 크기. Transform의 스케일은 자동 적용하지 않는다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static Collider[] OverlapBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapBox(center, size * 0.5f, rotation ?? Quaternion.identity, layerMask, triggerInteraction);
@@ -90,7 +92,7 @@ public static class PhysicsQueryHelper
     /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static int OverlapBoxNonAlloc(Vector3 center, Vector3 size, Collider[] results, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
@@ -106,7 +108,7 @@ public static class PhysicsQueryHelper
     /// <param name="point0">한쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static Collider[] OverlapCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         Collider[] result = Physics.OverlapCapsule(point0, point1, radius, layerMask, triggerInteraction);
@@ -123,7 +125,7 @@ public static class PhysicsQueryHelper
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="results">결과 버퍼. 반환 개수 미만의 인덱스만 유효하며, 제외 대상도 조회 버퍼 공간을 차지하므로, 제외 후 개수가 작아도 일부 결과가 누락될 수 있다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     public static int OverlapCapsuleNonAlloc(Vector3 point0, Vector3 point1, float radius, Collider[] results, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
         ValidateResults(results);
@@ -137,7 +139,7 @@ public static class PhysicsQueryHelper
     /// 구 영역과 겹치는 콜라이더가 하나라도 있는지 확인한다.
     /// </summary>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
     public static bool CheckSphere(Vector3 center, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
@@ -154,7 +156,7 @@ public static class PhysicsQueryHelper
     /// <param name="size">회전 전 각 축의 전체 크기. Transform의 스케일은 자동 적용하지 않는다.</param>
     /// <param name="rotation">박스의 월드 회전. 생략하면 기본 회전을 사용한다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
     public static bool CheckBox(Vector3 center, Vector3 size, Quaternion? rotation = null, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
@@ -171,7 +173,7 @@ public static class PhysicsQueryHelper
     /// <param name="point0">한쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="point1">다른 쪽 끝 구의 월드 중심. 캡슐 표면의 끝점이 아니다.</param>
     /// <param name="ignoreObjects">제외할 오브젝트 목록. 각 오브젝트와 모든 자식의 콜라이더를 제외하며, null 항목은 건너뛴다.</param>
-    /// <param name="debug">표시 설정. null이면 그리지 않으며, 호출 시점의 영역을 표시한다.</param>
+    /// <param name="debug">표시 설정. 전역 디버그가 켜져 있으면 null은 기본 설정으로 표시하며, None도 한 프레임 표시한다. 호출 시점의 영역을 표시한다.</param>
     /// <remarks>제외 목록이 있으면 Overlap 결과 배열을 생성하여 대상별로 검사한다.</remarks>
     public static bool CheckCapsule(Vector3 point0, Vector3 point1, float radius, int layerMask = Physics.AllLayers, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, IReadOnlyList<GameObject> ignoreObjects = null, PhysicsQueryDebug debug = null)
     {
@@ -236,11 +238,28 @@ public static class PhysicsQueryHelper
     }
 
     /// <summary>
+    /// 전역 또는 개별 설정이 활성화되면 표시 설정을 반환하고, 생략된 설정은 재사용한다.
+    /// </summary>
+    private static PhysicsQueryDebug GetDebugSettings(PhysicsQueryDebug debug)
+    {
+        bool isDebugEnabled = GameConfig.IsCollisionDebugEnabled || (debug != null && debug.drawMode != eDebugDrawMode.None);
+        if (!isDebugEnabled)
+        {
+            return null;
+        }
+        return debug ?? _defaultDebug;
+    }
+
+    /// <summary>
     /// 서로 수직인 세 원으로 구 영역을 표시한다.
     /// </summary>
     private static void DrawSphere(Vector3 center, float radius, PhysicsQueryDebug debug, bool hasHit)
     {
-        if (debug == null || debug.drawMode == eDebugDrawMode.None) return;
+        debug = GetDebugSettings(debug);
+        if (debug == null)
+        {
+            return;
+        }
         DrawArc(center, Vector3.right, Vector3.up, radius, 0f, Mathf.PI * 2f, debug, hasHit);
         DrawArc(center, Vector3.right, Vector3.forward, radius, 0f, Mathf.PI * 2f, debug, hasHit);
         DrawArc(center, Vector3.up, Vector3.forward, radius, 0f, Mathf.PI * 2f, debug, hasHit);
@@ -251,7 +270,11 @@ public static class PhysicsQueryHelper
     /// </summary>
     private static void DrawBox(Vector3 center, Vector3 size, Quaternion rotation, PhysicsQueryDebug debug, bool hasHit)
     {
-        if (debug == null || debug.drawMode == eDebugDrawMode.None) return;
+        debug = GetDebugSettings(debug);
+        if (debug == null)
+        {
+            return;
+        }
         Vector3 halfExtents = size * 0.5f;
 
         // 각 비트를 꼭짓점의 축별 부호로 사용하여 배열 할당 없이 모서리를 연결한다.
@@ -272,7 +295,11 @@ public static class PhysicsQueryHelper
     /// </summary>
     private static void DrawCapsule(Vector3 point0, Vector3 point1, float radius, PhysicsQueryDebug debug, bool hasHit)
     {
-        if (debug == null || debug.drawMode == eDebugDrawMode.None) return;
+        debug = GetDebugSettings(debug);
+        if (debug == null)
+        {
+            return;
+        }
         Vector3 offset = point1 - point0;
         if (offset.sqrMagnitude < 0.000001f)
         {

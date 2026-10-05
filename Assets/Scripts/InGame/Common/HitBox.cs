@@ -23,6 +23,8 @@ namespace Game
             }
         }
 
+        #region Inspector
+
         [Header("충돌 지점 디버그")]
         public bool isHitDebugEnabled = false;
         public Color hitDebugColor = Color.yellow;
@@ -35,7 +37,7 @@ namespace Game
 
         public bool isHitDebugDepthTest = false;
 
-        private Collider _debugCollider;
+        #endregion
 
         private Transform _transform;
 
@@ -94,12 +96,26 @@ namespace Game
             }
         }
 
+        //private void OnTriggerStay(Collider other)
+        //{
+
+        //}
+
+        private void OnTriggerExit(Collider other)
+        {
+            _colliders.Remove(other);
+        }
+
+        #region ## DEBUG ##
+
+        private Collider _debugCollider;
+
         /// <summary>
         /// 유효한 HitBox 감지 위치를 게임 화면에 정육면체 표식으로 표시한다.
         /// </summary>
         private void DrawHitDebug(Collider other)
         {
-            if (!isHitDebugEnabled)
+            if (!(isHitDebugEnabled || GameConfig.IsCollisionDebugEnabled))
             {
                 return;
             }
@@ -127,14 +143,6 @@ namespace Game
             PhysicsQueryDebugRenderer.DrawCube(point, size, hitDebugColor, duration, isHitDebugDepthTest);
         }
 
-        //private void OnTriggerStay(Collider other)
-        //{
-
-        //}
-
-        private void OnTriggerExit(Collider other)
-        {
-            _colliders.Remove(other);
-        }
+        #endregion
     }
 }

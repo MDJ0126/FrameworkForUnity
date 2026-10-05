@@ -1,6 +1,6 @@
 namespace Game
 {
-    public abstract class PlayerController : PawnController
+    public abstract class AIController : PawnController
     {
         /// <summary>
         /// 빙의

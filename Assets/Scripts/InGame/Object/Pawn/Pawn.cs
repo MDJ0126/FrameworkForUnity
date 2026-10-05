@@ -87,7 +87,7 @@ namespace Game
         /// <summary>
         /// 플레이어 컨트롤러 빙의 시 파생 Pawn에서 사용할 처리 지점
         /// </summary>
-        public virtual void Possess(PlayerController playerController)
+        public virtual void Possess(PawnController pawnController)
         {
 
         }
@@ -95,7 +95,7 @@ namespace Game
         /// <summary>
         /// 플레이어 컨트롤러 빙의 해제 시 파생 Pawn에서 사용할 처리 지점
         /// </summary>
-        public virtual void Unpossess(PlayerController playerController)
+        public virtual void Unpossess(PawnController pawnController)
         {
 
         }

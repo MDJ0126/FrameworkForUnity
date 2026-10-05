@@ -23,6 +23,6 @@ GitHub: [MDJ0126/SampleProjectForUnity](https://github.com/MDJ0126/SampleProject
 
 ## 유니티 설정
 
-- **문서 열기:** Framework → 프로젝트 문서 열기. 기본 브라우저에서 문서를 엽니다.
-- **자동 열기:** Framework → 시작 시 문서 자동 열기. 체크로 켜고 끕니다. 기본값은 켜짐입니다.
+- **문서 열기:** Sample Project → 프로젝트 문서 열기. 기본 브라우저에서 문서를 엽니다.
+- **자동 열기:** Sample Project → 시작 시 문서 자동 열기. 체크로 켜고 끕니다. 기본값은 켜짐입니다.
 - **설정 저장:** 이 컴퓨터의 프로젝트별로 저장됩니다.

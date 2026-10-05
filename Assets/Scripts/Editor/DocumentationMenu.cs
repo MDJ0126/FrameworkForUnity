@@ -9,13 +9,16 @@ using UnityEngine;
 [InitializeOnLoad]
 public static class DocumentationMenu
 {
-    private const string AUTO_OPEN_MENU = "Framework/시작 시 문서 자동 열기";
+    private const string AUTO_OPEN_MENU = "Sample Project/시작 시 문서 자동 열기";
     private static string PreferenceKey => "FrameworkForUnity.Documentation.AutoOpen." + Application.dataPath;
     private static string SessionKey => PreferenceKey + ".StartupHandled";
 
     static DocumentationMenu()
     {
-        if (Application.isBatchMode || SessionState.GetBool(SessionKey, false)) return;
+        if (Application.isBatchMode || SessionState.GetBool(SessionKey, false))
+        {
+            return;
+        }
 
         // SessionState는 재컴파일 동안 유지되고 에디터 종료 시 초기화된다.
         SessionState.SetBool(SessionKey, true);
@@ -33,8 +36,14 @@ public static class DocumentationMenu
             return;
         }
 
-        if (!EditorPrefs.GetBool(PreferenceKey, true)) return;
-        if (!File.Exists(DocumentPath)) return;
+        if (!EditorPrefs.GetBool(PreferenceKey, true))
+        {
+            return;
+        }
+        if (!File.Exists(DocumentPath))
+        {
+            return;
+        }
         OpenDocumentation();
     }
 
@@ -64,7 +73,7 @@ public static class DocumentationMenu
     /// <summary>
     /// 프로젝트 경로를 기준으로 문서 홈을 연다.
     /// </summary>
-    [MenuItem("Framework/프로젝트 문서 열기", false, 100)]
+    [MenuItem("Sample Project/프로젝트 문서 열기", false, 100)]
     private static void OpenDocumentation()
     {
         string documentPath = DocumentPath;

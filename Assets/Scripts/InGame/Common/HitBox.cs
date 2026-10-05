@@ -23,6 +23,20 @@ namespace Game
             }
         }
 
+        [Header("충돌 지점 디버그")]
+        public bool isHitDebugEnabled = false;
+        public Color hitDebugColor = Color.yellow;
+
+        [Tooltip("표시 유지 시간(게임 시간, 초). 0이면 한 프레임 표시한다.")]
+        [Min(0f)] public float hitDebugDuration = 2f;
+
+        [Tooltip("근사 감지 위치에 표시할 정육면체 표식의 전체 크기(월드 단위).")]
+        [Min(0.01f)] public float hitDebugSize = 0.2f;
+
+        public bool isHitDebugDepthTest = false;
+
+        private Collider _debugCollider;
+
         private Transform _transform;
 
         public Transform Transform
@@ -30,7 +44,9 @@ namespace Game
             get
             {
                 if (_transform == null)
+                {
                     _transform = transform;
+                }
                 return _transform;
             }
         }
@@ -72,9 +88,43 @@ namespace Game
 
             if (!_colliders.Exists(c => c.Equals(other)))
             {
+                DrawHitDebug(other);
                 _onHit?.Invoke(hitBox);
                 _colliders.Add(other);
             }
+        }
+
+        /// <summary>
+        /// 유효한 HitBox 감지 위치를 게임 화면에 정육면체 표식으로 표시한다.
+        /// </summary>
+        private void DrawHitDebug(Collider other)
+        {
+            if (!isHitDebugEnabled)
+            {
+                return;
+            }
+
+            if (_debugCollider == null)
+            {
+                _debugCollider = GetComponent<Collider>();
+            }
+
+            // Trigger에는 접촉점 정보가 없으므로 상대 콜라이더에 대한 최근접 위치로 근사한다.
+            Vector3 origin = _debugCollider != null ? _debugCollider.bounds.center : Transform.position;
+            Vector3 point = other.ClosestPoint(origin);
+            float duration = hitDebugDuration;
+            if (float.IsNaN(duration) || float.IsInfinity(duration) || duration < 0f)
+            {
+                duration = 0f;
+            }
+
+            float size = hitDebugSize;
+            if (float.IsNaN(size) || float.IsInfinity(size) || size <= 0f)
+            {
+                size = 0.2f;
+            }
+
+            PhysicsQueryDebugRenderer.DrawCube(point, size, hitDebugColor, duration, isHitDebugDepthTest);
         }
 
         //private void OnTriggerStay(Collider other)

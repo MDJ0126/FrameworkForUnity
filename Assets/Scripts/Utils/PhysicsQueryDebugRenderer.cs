@@ -12,6 +12,8 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     private static PhysicsQueryDebugRenderer _instance;
     private LineBatch _overlay;
     private LineBatch _depthTest;
+    private LineBatch _overlayMarkers;
+    private LineBatch _depthMarkers;
 
 #if UNITY_EDITOR
     /// <summary>
@@ -61,7 +63,67 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     /// </summary>
     internal static void DrawLine(Vector3 start, Vector3 end, Color color, float duration, bool depthTest)
     {
-        if (!Application.isPlaying) return;
+        if (!EnsureInstance())
+        {
+            return;
+        }
+        LineBatch batch = depthTest ? _instance._depthTest : _instance._overlay;
+        batch.Add(start, end, color, duration);
+    }
+
+    /// <summary>
+    /// 감지 지점을 면이 채워진 정육면체 메시로 표시한다.
+    /// </summary>
+    internal static void DrawCube(Vector3 center, float size, Color color, float duration, bool depthTest)
+    {
+        if (!EnsureInstance())
+        {
+            return;
+        }
+        if (_instance._overlayMarkers == null)
+        {
+            Shader shader = _instance._overlay.Material.shader;
+            _instance._overlayMarkers = new LineBatch(_instance.transform, shader, false, MeshTopology.Triangles);
+            _instance._depthMarkers = new LineBatch(_instance.transform, shader, true, MeshTopology.Triangles);
+        }
+        LineBatch batch = depthTest ? _instance._depthMarkers : _instance._overlayMarkers;
+        float halfSize = size * 0.5f;
+        for (int i = 0; i < _cubeIndices.Length; i += 3)
+        {
+            Vector3 a = GetCubeCorner(center, halfSize, _cubeIndices[i]);
+            Vector3 b = GetCubeCorner(center, halfSize, _cubeIndices[i + 1]);
+            Vector3 c = GetCubeCorner(center, halfSize, _cubeIndices[i + 2]);
+            batch.Add(a, b, color, duration, c);
+        }
+    }
+
+    private static readonly int[] _cubeIndices =
+    {
+        0, 1, 3, 0, 3, 2,
+        4, 6, 7, 4, 7, 5,
+        0, 2, 6, 0, 6, 4,
+        1, 5, 7, 1, 7, 3,
+        0, 4, 5, 0, 5, 1,
+        2, 3, 7, 2, 7, 6,
+    };
+
+    /// <summary>
+    /// 비트로 지정한 축별 부호로 정육면체의 월드 꼭짓점을 계산한다.
+    /// </summary>
+    private static Vector3 GetCubeCorner(Vector3 center, float halfSize, int index)
+    {
+        return center + new Vector3((index & 1) == 0 ? -halfSize : halfSize, (index & 2) == 0 ? -halfSize : halfSize, (index & 4) == 0 ? -halfSize : halfSize);
+    }
+
+    /// <summary>
+    /// 플레이 중 공통 렌더링 자원을 준비한다.
+    /// </summary>
+    private static bool EnsureInstance()
+    {
+        if (!Application.isPlaying)
+        {
+            return false;
+        }
         if (_instance == null)
         {
             // Resources에 셰이더를 두어 빌드에서도 참조가 유지되도록 한다.
@@ -69,7 +131,7 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
             if (shader == null || !shader.isSupported)
             {
                 Debug.LogError("PhysicsQueryDebug 셰이더를 로드할 수 없거나 현재 플랫폼에서 지원하지 않습니다.");
-                return;
+                return false;
             }
 
             GameObject root = new GameObject("PhysicsQueryDebugRenderer") { hideFlags = HideFlags.DontSave };
@@ -79,8 +141,7 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
             _instance._depthTest = new LineBatch(root.transform, shader, true);
         }
 
-        LineBatch batch = depthTest ? _instance._depthTest : _instance._overlay;
-        batch.Add(start, end, color, duration);
+        return true;
     }
 
     /// <summary>
@@ -90,6 +151,8 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     {
         _overlay?.UpdateMesh();
         _depthTest?.UpdateMesh();
+        _overlayMarkers?.UpdateMesh();
+        _depthMarkers?.UpdateMesh();
     }
 
     /// <summary>
@@ -99,6 +162,8 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     {
         _overlay?.Clear();
         _depthTest?.Clear();
+        _overlayMarkers?.Clear();
+        _depthMarkers?.Clear();
     }
 
     /// <summary>
@@ -117,8 +182,12 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     {
         _overlay?.Dispose(isImmediate);
         _depthTest?.Dispose(isImmediate);
+        _overlayMarkers?.Dispose(isImmediate);
+        _depthMarkers?.Dispose(isImmediate);
         _overlay = null;
         _depthTest = null;
+        _overlayMarkers = null;
+        _depthMarkers = null;
         foreach (MeshFilter filter in GetComponentsInChildren<MeshFilter>(true))
         {
             Mesh mesh = filter.sharedMesh;
@@ -148,6 +217,7 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
     {
         public Vector3 start;
         public Vector3 end;
+        public Vector3 third;
         public Color color;
         public double expiresAt;
         public bool isTimed;
@@ -166,10 +236,13 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
         private readonly Mesh _mesh;
         private readonly Material _material;
         private readonly MeshRenderer _renderer;
+        private readonly MeshTopology _topology;
+        public Material Material => _material;
 
-        public LineBatch(Transform parent, Shader shader, bool depthTest)
+        public LineBatch(Transform parent, Shader shader, bool depthTest, MeshTopology topology = MeshTopology.Lines)
         {
-            GameObject child = new GameObject(depthTest ? "DepthTestLines" : "OverlayLines") { hideFlags = HideFlags.DontSave };
+            _topology = topology;
+            GameObject child = new GameObject((depthTest ? "DepthTest" : "Overlay") + topology) { hideFlags = HideFlags.DontSave };
             child.transform.SetParent(parent, false);
             _mesh = new Mesh { name = child.name, hideFlags = HideFlags.DontSave, indexFormat = IndexFormat.UInt32 };
             _mesh.MarkDynamic();
@@ -189,12 +262,13 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
         /// <summary>
         /// 표시 중 설정 변경의 영향을 받지 않도록 선과 수명을 값으로 저장한다.
         /// </summary>
-        public void Add(Vector3 start, Vector3 end, Color color, float duration)
+        public void Add(Vector3 start, Vector3 end, Color color, float duration, Vector3 third = default)
         {
             _lines.Add(new Line
             {
                 start = start,
                 end = end,
+                third = third,
                 color = color,
                 isTimed = duration > 0f,
                 expiresAt = Time.timeAsDouble + duration,
@@ -229,6 +303,12 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
                 _indices.Add(_vertices.Count);
                 _vertices.Add(line.end);
                 _colors.Add(line.color);
+                if (_topology == MeshTopology.Triangles)
+                {
+                    _indices.Add(_vertices.Count);
+                    _vertices.Add(line.third);
+                    _colors.Add(line.color);
+                }
             }
 
             if (remaining < _lines.Count) _lines.RemoveRange(remaining, _lines.Count - remaining);
@@ -237,7 +317,7 @@ internal sealed class PhysicsQueryDebugRenderer : MonoBehaviour
             if (remaining == 0) return;
             _mesh.SetVertices(_vertices);
             _mesh.SetColors(_colors);
-            _mesh.SetIndices(_indices, MeshTopology.Lines, 0);
+            _mesh.SetIndices(_indices, _topology, 0);
             _mesh.RecalculateBounds();
         }
 

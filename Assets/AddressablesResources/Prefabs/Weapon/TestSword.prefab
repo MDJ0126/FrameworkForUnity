@@ -133,6 +133,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Role: 1
+  isAttackSweepEnabled: 0
+  sweepStepDistance: 0.05
+  maxSweepSteps: 64
+  sweepDebugDuration: 0.5
+  sweepDebugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  sweepDebugHitColor: {r: 0, g: 1, b: 0, a: 1}
   isHitDebugEnabled: 0
   hitDebugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitDebugDuration: 2

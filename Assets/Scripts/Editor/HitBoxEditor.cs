@@ -105,7 +105,7 @@ public class HitBoxEditor : Editor
     private void DrawDebug()
     {
         BeginCard("DEBUG VISUALS", "게임뷰에서 충돌 지점과 검사 궤적 확인", new Color(0.35f, 0.8f, 0.6f));
-        EditorGUILayout.HelpBox("충돌 지점은 정육면체로 표시하고, Attack Sweep의 검사 궤적은 박스로 남깁니다. 궤적 박스는 후보 검색 범위이며 실제 타격은 원래 콜라이더의 겹침으로 판단합니다.\n개별 디버그 또는 GameConfig.IsCollisionDebugEnabled가 켜지면 표시합니다. 빌드에서도 표시되며 유지 시간 0은 한 프레임입니다.", MessageType.Info);
+        EditorGUILayout.HelpBox("충돌 지점은 정육면체로 표시합니다. 스윕이 꺼져 있거나 Hurt 역할이면 현재 HitBox를 콜라이더 종류에 맞는 캡슐·구·박스로 실시간 표시하며 추가 충돌 검사는 하지 않습니다. Attack Sweep이 켜지면 검사 궤적을 박스로 남깁니다. 궤적 박스는 후보 검색 범위이며 실제 타격은 원래 콜라이더의 겹침으로 판단합니다.\n개별 디버그 또는 GameConfig.IsCollisionDebugEnabled가 켜지면 표시합니다. 빌드에서도 표시되며 유지 시간 0은 한 프레임입니다.", MessageType.Info);
         EditorGUILayout.LabelField(GameConfig.IsCollisionDebugEnabled ? "● 전역 디버그 켜짐 · 개별 체크와 관계없이 표시" : "○ 전역 디버그 꺼짐 · 개별 체크로 표시", EditorStyles.miniBoldLabel);
         DrawToggle(_debugEnabled, "HitBox 디버그 표시");
         bool canDebug = GameConfig.IsCollisionDebugEnabled || _debugEnabled.hasMultipleDifferentValues || _debugEnabled.boolValue;
@@ -115,7 +115,7 @@ public class HitBoxEditor : Editor
             EditorGUILayout.LabelField("충돌 지점", EditorStyles.boldLabel);
             DrawField("hitDebugColor", "표식 색상");
             DrawField("hitDebugDuration", "유지 시간 (초)");
-            DrawField("hitDebugSize", "정육면체 크기", "한 변의 길이이며 월드 단위입니다.");
+            DrawField("hitDebugSize", "정육면체 크기", "충돌 지점 정육면체 한 변의 길이입니다. 현재 HitBox 영역 크기는 콜라이더에서 가져옵니다.");
             EditorGUILayout.Space(5f);
             EditorGUILayout.LabelField("스윕 검사 궤적", EditorStyles.boldLabel);
             bool canSweep = (_role.hasMultipleDifferentValues || _role.enumValueIndex == (int)HitBox.eHitBoxRole.Attack) && (_sweepEnabled.hasMultipleDifferentValues || _sweepEnabled.boolValue);

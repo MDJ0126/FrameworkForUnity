@@ -253,7 +253,7 @@ public static class PhysicsQueryHelper
     /// <summary>
     /// 서로 수직인 세 원으로 구 영역을 표시한다.
     /// </summary>
-    private static void DrawSphere(Vector3 center, float radius, PhysicsQueryDebug debug, bool hasHit)
+    internal static void DrawSphere(Vector3 center, float radius, PhysicsQueryDebug debug, bool hasHit)
     {
         debug = GetDebugSettings(debug);
         if (debug == null)
@@ -293,7 +293,7 @@ public static class PhysicsQueryHelper
     /// <summary>
     /// 구 중심 사이의 축에 맞춰 캡슐의 원통과 양 끝 반구를 표시한다.
     /// </summary>
-    private static void DrawCapsule(Vector3 point0, Vector3 point1, float radius, PhysicsQueryDebug debug, bool hasHit)
+    internal static void DrawCapsule(Vector3 point0, Vector3 point1, float radius, PhysicsQueryDebug debug, bool hasHit)
     {
         debug = GetDebugSettings(debug);
         if (debug == null)

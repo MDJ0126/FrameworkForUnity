@@ -48,7 +48,7 @@ namespace Game
 
         [Header("Attack Sweep")]
         [Tooltip("Attack의 프레임 사이를 검사한다. Box, Sphere, Capsule 및 Convex MeshCollider를 지원한다.")]
-        public bool isAttackSweepEnabled = true;
+        public bool isAttackSweepEnabled = false;
 
         [Tooltip("이동과 회전으로 움직이는 끝점의 검사 간격(월드 단위). 작을수록 검사가 촘촘해진다.")]
         [Min(0.001f)] public float sweepStepDistance = 0.05f;
@@ -107,6 +107,7 @@ namespace Game
         private Quaternion _previousRotation;
         private Vector3 _previousScale;
         private bool _hasPreviousPose;
+        private readonly PhysicsQueryHelper.PhysicsQueryDebug _shapeDebug = new();
         private Collider[] _sweepResults = new Collider[32];
         private readonly HashSet<Collider> _sweepContacts = new();
         private readonly HashSet<Collider> _frameSweepContacts = new();
@@ -148,7 +149,11 @@ namespace Game
             {
                 return;
             }
-            ProcessHit(other, other.ClosestPoint(HitCollider.bounds.center));
+            if (!CanHit(other, out _) || HasContact(other))
+            {
+                return;
+            }
+            ProcessHit(other, GetHitDebugPoint(other, HitCollider.bounds.center));
         }
 
         /// <summary>
@@ -218,6 +223,7 @@ namespace Game
             {
                 _hasPreviousPose = false;
                 _sweepContacts.Clear();
+                DrawCurrentHitBoxDebug();
                 return;
             }
             if (!_hasPreviousPose || _previousScale != Transform.lossyScale)
@@ -268,7 +274,7 @@ namespace Game
                     }
                     hasHit = true;
                     _frameSweepContacts.Add(other);
-                    ProcessHit(other, other.ClosestPoint(center));
+                    ProcessHit(other, GetHitDebugPoint(other, center));
                     if (!isActiveAndEnabled || !HitCollider.enabled)
                     {
                         _hasPreviousPose = false;
@@ -339,16 +345,62 @@ namespace Game
         }
 
         /// <summary>
+        /// 스윕을 수행하지 않을 때 추가 물리 조회 없이 현재 영역을 한 프레임 표시한다.
+        /// </summary>
+        private void DrawCurrentHitBoxDebug()
+        {
+            if (!(isHitDebugEnabled || GameConfig.IsCollisionDebugEnabled) || HitCollider == null || !HitCollider.enabled)
+            {
+                return;
+            }
+            _shapeDebug.drawMode = PhysicsQueryHelper.eDebugDrawMode.ForOneFrame;
+            _shapeDebug.color = hitDebugColor;
+            _shapeDebug.depthTest = isHitDebugDepthTest;
+            Vector3 scale = Transform.lossyScale;
+            Vector3 absoluteScale = new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z));
+            if (HitCollider is SphereCollider sphere)
+            {
+                Vector3 center = Transform.position + Transform.rotation * Vector3.Scale(sphere.center, scale);
+                float radius = sphere.radius * Mathf.Max(absoluteScale.x, absoluteScale.y, absoluteScale.z);
+                PhysicsQueryHelper.DrawSphere(center, radius, _shapeDebug, false);
+                return;
+            }
+            if (HitCollider is CapsuleCollider capsule)
+            {
+                Vector3 center = Transform.position + Transform.rotation * Vector3.Scale(capsule.center, scale);
+                Vector3 localAxis = capsule.direction == 0 ? Vector3.right : capsule.direction == 1 ? Vector3.up : Vector3.forward;
+                Vector3 axis = Transform.rotation * localAxis;
+                float radiusScale = capsule.direction == 0 ? Mathf.Max(absoluteScale.y, absoluteScale.z)
+                    : capsule.direction == 1 ? Mathf.Max(absoluteScale.x, absoluteScale.z) : Mathf.Max(absoluteScale.x, absoluteScale.y);
+                float radius = capsule.radius * radiusScale;
+                float halfSegment = Mathf.Max(0f, capsule.height * absoluteScale[capsule.direction] * 0.5f - radius);
+                PhysicsQueryHelper.DrawCapsule(center - axis * halfSegment, center + axis * halfSegment, radius, _shapeDebug, false);
+                return;
+            }
+            if (TryGetSweepBounds(out Vector3 localCenter, out Vector3 halfExtents))
+            {
+                Quaternion rotation = Transform.rotation;
+                Vector3 center = Transform.position + rotation * Vector3.Scale(localCenter, Transform.lossyScale);
+                DrawSweepDebug(center, halfExtents, rotation, false, false);
+            }
+            else
+            {
+                Bounds bounds = HitCollider.bounds;
+                DrawSweepDebug(bounds.center, bounds.extents, Quaternion.identity, false, false);
+            }
+        }
+
+        /// <summary>
         /// 중간 위치에서 후보 검색에 사용한 박스를 게임 화면에 남기고 실제 접촉 여부를 색으로 표시한다.
         /// </summary>
-        private void DrawSweepDebug(Vector3 center, Vector3 halfExtents, Quaternion rotation, bool hasHit)
+        private void DrawSweepDebug(Vector3 center, Vector3 halfExtents, Quaternion rotation, bool hasHit, bool isTrail = true)
         {
             if (!(isHitDebugEnabled || GameConfig.IsCollisionDebugEnabled))
             {
                 return;
             }
-            float duration = float.IsNaN(sweepDebugDuration) || float.IsInfinity(sweepDebugDuration) ? 0f : Mathf.Max(0f, sweepDebugDuration);
-            Color color = hasHit ? sweepDebugHitColor : sweepDebugColor;
+            float duration = !isTrail || float.IsNaN(sweepDebugDuration) || float.IsInfinity(sweepDebugDuration) ? 0f : Mathf.Max(0f, sweepDebugDuration);
+            Color color = isTrail ? (hasHit ? sweepDebugHitColor : sweepDebugColor) : hitDebugColor;
             for (int corner = 0; corner < 8; corner++)
             {
                 Vector3 start = center + rotation * GetSweepCorner(corner, halfExtents);
@@ -373,6 +425,22 @@ namespace Game
         }
 
         #region ## DEBUG ##
+
+        /// <summary>
+        /// 지원 형상은 표면 최근접점을 사용하고, 나머지는 월드 외접 박스의 근사점을 사용한다.
+        /// </summary>
+        private Vector3 GetHitDebugPoint(Collider other, Vector3 origin)
+        {
+            if (!(isHitDebugEnabled || GameConfig.IsCollisionDebugEnabled))
+            {
+                return origin;
+            }
+            if (other is BoxCollider || other is SphereCollider || other is CapsuleCollider || (other is MeshCollider mesh && mesh.convex))
+            {
+                return other.ClosestPoint(origin);
+            }
+            return other.bounds.ClosestPoint(origin);
+        }
 
         /// <summary>
         /// 유효한 HitBox 감지 위치를 게임 화면에 정육면체 표식으로 표시한다.

@@ -24,6 +24,7 @@ namespace Game
 
         public WidgetAnchor PawnInfoAnchor;
         public WidgetAnchor balloonAnchor;
+        public List<Equipment> equipmentList;
 
         #endregion
 
@@ -40,6 +41,13 @@ namespace Game
             base.Awake();
             Movement = GetComponent<Movement>();
             PawnAnimationController = GetComponentInChildren<PawnAnimationController>();
+            if (equipmentList != null)
+            {
+                foreach (Equipment equipment in equipmentList)
+                {
+                    equipment.SetOwner(this);
+                }
+            }
             Initalize();
         }
 

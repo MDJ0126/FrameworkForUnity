@@ -527,6 +527,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PawnInfoAnchor: {fileID: 5044493540828683380}
   balloonAnchor: {fileID: 9096739266768584353}
+  equipmentList:
+  - {fileID: 5732713696477780140}
   aimTarget:
     target: {fileID: 5417606405649275308}
     AimRig: {fileID: 4534822157157772568}
@@ -989,6 +991,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b37c0d6f5f5cb8409a64d9222537999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Role: 0
+  isHitDebugEnabled: 0
+  hitDebugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  hitDebugDuration: 2
+  hitDebugSize: 0.2
+  isHitDebugDepthTest: 0
 --- !u!4 &1084692116306545417 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400094, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
@@ -1024,7 +1032,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1318904549476743261, guid: 6f52f27ef25559147b52e63fbe9e8cdd, type: 3}
       propertyPath: m_Name
-      value: Sword
+      value: TestSword
       objectReference: {fileID: 0}
     - target: {fileID: 8188769606434217005, guid: 6f52f27ef25559147b52e63fbe9e8cdd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1071,6 +1079,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6f52f27ef25559147b52e63fbe9e8cdd, type: 3}
+--- !u!114 &5732713696477780140 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6828574070216955353, guid: 6f52f27ef25559147b52e63fbe9e8cdd, type: 3}
+  m_PrefabInstance: {fileID: 1246731062859173237}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f5cf024a09414e4f96c522e25698dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6983145518938214744 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8188769606434217005, guid: 6f52f27ef25559147b52e63fbe9e8cdd, type: 3}

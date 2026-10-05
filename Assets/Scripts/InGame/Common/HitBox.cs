@@ -8,24 +8,44 @@ namespace Game
     /// </summary>
     public class HitBox : MonoBehaviour
     {
-        public delegate void OnHitEvent(HitBox otherHitBox);
+        public delegate void OnHitEvent(HitBox myHitBox, HitBox otherHitBox);
         private event OnHitEvent _onHit = null;
         public event OnHitEvent OnHit
         {
-            add 
+            add
             {
                 _onHit -= value;
                 _onHit += value;
             }
-            remove 
+            remove
             {
-                _onHit -= value; 
+                _onHit -= value;
             }
+        }
+
+        /// <summary>
+        /// 충돌 판정 타입
+        /// </summary>
+        public enum eHitBoxRole
+        {
+            /// <summary>
+            /// 피격 판정용
+            /// </summary>
+            Hurt,
+            /// <summary>
+            /// 공격 판정용
+            /// </summary>
+            Attack,
         }
 
         #region Inspector
 
-        [Header("충돌 지점 디버그")]
+        /// <summary>
+        /// 판정 타입
+        /// </summary>
+        public eHitBoxRole Role = eHitBoxRole.Hurt;
+
+        [Header("Debug")]
         public bool isHitDebugEnabled = false;
         public Color hitDebugColor = Color.yellow;
 
@@ -38,6 +58,8 @@ namespace Game
         public bool isHitDebugDepthTest = false;
 
         #endregion
+
+        public Pawn Owner { get; private set; } = null;
 
         private Transform _transform;
 
@@ -63,6 +85,11 @@ namespace Game
         /// </summary>
         private List<Collider> _colliders = new();
 
+        private void Awake()
+        {
+            Owner = GetComponentInParent<Pawn>();
+        }
+
         /// <summary>
         /// 무시할 콜라이더 추가
         /// </summary>
@@ -83,6 +110,11 @@ namespace Game
                 return;
             }
 
+            if (hitBox.Role == Role)
+            {
+                return;
+            }
+
             if (_ignores.Exists(c => c.Equals(other)))
             {
                 return;
@@ -91,7 +123,7 @@ namespace Game
             if (!_colliders.Exists(c => c.Equals(other)))
             {
                 DrawHitDebug(other);
-                _onHit?.Invoke(hitBox);
+                _onHit?.Invoke(this, hitBox);
                 _colliders.Add(other);
             }
         }

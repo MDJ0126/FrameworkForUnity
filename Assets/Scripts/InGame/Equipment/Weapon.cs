@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Game
 {
     public abstract class Weapon : Equipment
@@ -24,9 +22,12 @@ namespace Game
             }
         }
 
-        private void OnHit(HitBox otherHitBox)
+        private void OnHit(HitBox myHitBox, HitBox otherHitBox)
         {
-            Debug.Log(otherHitBox);
+            if (otherHitBox.Role == HitBox.eHitBoxRole.Hurt)
+            {
+                otherHitBox.Owner.Damaged(Owner, new DamageInfo { damage = 10 });
+            }
         }
     }
 }

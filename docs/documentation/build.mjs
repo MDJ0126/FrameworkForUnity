@@ -205,6 +205,12 @@ function underlineMatches(html, terms) {
     return result + (underlined ? '</u>' : '');
   }).join('');
 }
+function scrollToDocument() {
+  const isMobile = window.matchMedia('(max-width: 850px)').matches;
+  const article = document.querySelector('article');
+  const top = isMobile ? Math.max(0, window.scrollY + article.getBoundingClientRect().top - 24) : 0;
+  window.scrollTo({ top, behavior: 'instant' });
+}
 function showScript(id, preserveScroll = false) {
   const script = scripts.find(script => script.id === id);
   if (!script) return false;
@@ -217,7 +223,7 @@ function showScript(id, preserveScroll = false) {
   document.querySelector('.pager').innerHTML = '';
   document.querySelectorAll('[data-chapter]').forEach(link => link.removeAttribute('aria-current'));
   document.title = script.name + ' · Unity 샘플 프로젝트';
-  if (!preserveScroll) window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!preserveScroll) scrollToDocument();
   return true;
 }
 const views = ${JSON.stringify(views).replaceAll('<', '\\u003c')};
@@ -226,7 +232,11 @@ let activeId = initialId;
 function showChapter(id) {
   if (showScript(id)) return;
   const view = views.find(view => view.id === id);
-  if (!view || activeId === id) return;
+  if (!view) return;
+  if (activeId === id) {
+    scrollToDocument();
+    return;
+  }
   activeId = id;
   const article = document.querySelector('article');
   article.id = view.id;
@@ -238,7 +248,7 @@ function showChapter(id) {
     if (link.dataset.chapter === id) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  scrollToDocument();
   if (window.mermaid) renderDiagrams();
 }
 document.addEventListener('click', event => {
@@ -249,7 +259,7 @@ document.addEventListener('click', event => {
   if (scripts.some(script => script.id === scriptId)) {
     event.preventDefault();
     showScript(scriptId);
-    if (location.hash !== '#' + scriptId) location.hash = '#' + scriptId;
+    if (location.hash !== '#' + scriptId) history.pushState(null, '', '#' + scriptId);
     return;
   }
   const view = views.find(view => view.page === link.getAttribute('href'));
@@ -260,9 +270,11 @@ document.addEventListener('click', event => {
     updateSearch();
   }
   showChapter(view.id);
-  if (location.hash !== '#' + view.id) location.hash = '#' + view.id;
+  if (location.hash !== '#' + view.id) history.pushState(null, '', '#' + view.id);
 });
 window.addEventListener('hashchange', () => showChapter(location.hash.slice(1) || initialId));
+window.addEventListener('popstate', () => showChapter(location.hash.slice(1) || initialId));
+history.scrollRestoration = 'manual';
 showChapter(location.hash.slice(1));
 const searchIndex = ${JSON.stringify(searchIndex).replaceAll('<', '\\u003c')};
 function matchesScriptName(name, term) {

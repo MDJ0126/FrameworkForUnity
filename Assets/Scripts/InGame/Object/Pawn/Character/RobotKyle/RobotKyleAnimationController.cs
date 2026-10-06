@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Game
 {
     public class RobotKyleAnimationController : CharacterAnimationController
@@ -29,13 +27,6 @@ namespace Game
             {
                 _roboyKlye.Movement.StopMove();
             }
-        }
-
-        /// <summary>
-        /// 공격 처리
-        /// </summary>
-        private void OnTakeDamage()
-        {
 
         }
 
@@ -49,10 +40,27 @@ namespace Game
         }
 
         /// <summary>
+        /// 데미지 체크 시작
+        /// </summary>
+        private void OnStartDamageCheck()
+        {
+            _roboyKlye.EquippedWeapon?.StartAttack();
+        }
+
+        /// <summary>
+        /// 데미지 체크 종료
+        /// </summary>
+        private void OnEndDamageCheck()
+        {
+            _roboyKlye.EquippedWeapon?.EndAttack();
+        }
+
+        /// <summary>
         /// 피격 받음
         /// </summary>
         public void OnHitted()
         {
+            _roboyKlye.EquippedWeapon?.EndAttack();
             boneAnimator.SetTrigger(AnimHash.Hit);
         }
     }

@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace Game
 {
-    public abstract class Pawn : BaseObject
+    /// <summary>
+    /// 액터를 상속받으며, 플레이어나 AI가 조종(빙의)할 수 있는 액터
+    /// </summary>
+    public abstract class Pawn : Actor
     {
         public delegate void OnDamagedEvent(Pawn attacker, Pawn target);
         private event OnDamagedEvent _onDamaged = null;
@@ -35,6 +38,7 @@ namespace Game
         public Movement Movement { get; private set; }
         public PawnAnimationController PawnAnimationController { get; private set; }
         protected List<FollowHUD> followHUDs = new();
+        public Weapon EquippedWeapon { get; private set; } = null;
 
         protected override void Awake()
         {
@@ -46,6 +50,10 @@ namespace Game
                 foreach (Equipment equipment in equipmentList)
                 {
                     equipment.SetOwner(this);
+                    if (equipment is Weapon weapon)
+                    {
+                        EquippedWeapon = weapon;
+                    }
                 }
             }
             Initalize();

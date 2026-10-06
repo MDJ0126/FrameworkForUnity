@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+
 namespace Game
 {
     public abstract class Weapon : Equipment
     {
         public HitBox hitBox;
+        private List<Pawn> _hittedPawns = new();
 
         protected override void OnEnable()
         {
@@ -11,6 +14,7 @@ namespace Game
             {
                 hitBox.OnHit += OnHit;
             }
+            hitBox.enabled = false;
         }
 
         protected override void OnDisable()
@@ -22,11 +26,26 @@ namespace Game
             }
         }
 
+        public virtual void StartAttack()
+        {
+            _hittedPawns.Clear();
+            hitBox.enabled = true;
+        }
+
+        public virtual void EndAttack()
+        {
+            hitBox.enabled = false;
+        }
+
         private void OnHit(HitBox myHitBox, HitBox otherHitBox)
         {
             if (otherHitBox.Role == HitBox.eHitBoxRole.Hurt)
             {
-                otherHitBox.Owner.Damaged(Owner, new DamageInfo { damage = 10 });
+                if (!_hittedPawns.Contains(otherHitBox.Owner))
+                {
+                    _hittedPawns.Add(otherHitBox.Owner);
+                    otherHitBox.Owner.Damaged(Owner, new DamageInfo { damage = Owner.StatusInfo.baseStatus.damage });
+                }
             }
         }
     }

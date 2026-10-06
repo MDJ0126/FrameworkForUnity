@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Game
 {
     public abstract class AIController : PawnController
@@ -16,6 +18,15 @@ namespace Game
         public override void Unpossess()
         {
             base.Unpossess();
+        }
+
+        /// <summary>
+        /// 목적지로 이동하기
+        /// </summary>
+        /// <param name="destination"></param>
+        public virtual void MoveTo(Vector3 destination)
+        {
+
         }
     }
 }

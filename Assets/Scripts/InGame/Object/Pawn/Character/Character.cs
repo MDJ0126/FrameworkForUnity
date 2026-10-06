@@ -3,6 +3,9 @@ using UnityEngine.Animations.Rigging;
 
 namespace Game
 {
+    /// <summary>
+    /// 폰을 상속 받으며, 폰의 기능에 더해 이동 기능이 추가된 액터
+    /// </summary>
     public abstract class Character : Pawn
     {
         #region Inspector

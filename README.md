@@ -32,6 +32,11 @@ TPS 게임을 구성하는 주요 기능과, 이를 하나의 게임으로 연�
 ### 캐릭터 · 컨트롤러 상속 관계
 
 ```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
 classDiagram
     Actor <|-- Pawn
     Pawn <|-- Character
@@ -73,44 +78,35 @@ classDiagram
 ```mermaid
 ---
 config:
-  theme: base
-  themeVariables:
-    background: "#b8c7d9"
-    primaryColor: "#edf2f8"
-    primaryTextColor: "#1e293b"
-    primaryBorderColor: "#94a3b8"
-    lineColor: "#64748b"
-    secondaryColor: "#d6e0ed"
-    tertiaryColor: "#d6e0ed"
-    clusterBkg: "#d6e0ed"
-    clusterBorder: "#8da2ba"
-    titleColor: "#334155"
-    edgeLabelBackground: "#d6e0ed"
-  themeCSS: |
-    a, a:link, a:visited, a:hover, a:active, a:focus, a *,
-    .node a, .node a:link, .node a:visited, .node a:hover,
-    .node .nodeLabel, .node .nodeLabel *, .node text {
-      color: #1e293b !important;
-      fill: #1e293b !important;
-      text-decoration: none !important;
-      text-decoration-line: none !important;
-    }
+  class:
+    hideEmptyMembersBox: true
 ---
-flowchart LR
-    GameMode[Game Mode] -->|기본 Pawn 빙의 요청| Controller[Player Controller]
-    Controller -->|빙의 · 입력 전달| Character[Character / Pawn]
-    Controller -->|Spring Arm 연결| Camera["Camera Controller<br/>궤도 회전 · 장애물 대응"]
-    Character -->|HUD 부착 · 해제| HUD["HUD Manager<br/>Object Pool · 월드 추적 HUD"]
-
-    classDef default fill:#edf2f8,stroke:#8da2ba,color:#1e293b
-    classDef focus fill:#b9d3ef,stroke:#527fae,color:#1e293b,stroke-width:2px
-    class Character focus
-
+classDiagram
+    direction LR
+    GameMode --> PlayerController : 기본 Pawn 빙의 요청
+    PlayerController --> Pawn : 빙의 · 입력 전달
+    PlayerController --> PlayerCameraController : SpringArm 연결
+    Pawn --> HUDManager : 활성화 / 비활성화 시 HUD 부착 / 해제
+    class GameMode {
+        기본 Pawn 빙의 요청
+    }
+    class PlayerController {
+        PawnController 기반 빙의 관리 · 파생 클래스 입력 처리
+    }
+    class Pawn {
+        Character의 기반 · 빙의 대상
+    }
+    class PlayerCameraController {
+        궤도 회전 · 장애물 대응
+    }
+    class HUDManager {
+        Object Pool · 월드 추적 HUD
+    }
     click GameMode href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Management/GameMode.cs" "GameMode.cs 열기" _blank
-    click Controller href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/PlayerController.cs" "PlayerController.cs 열기" _blank
-    click Character href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/Character.cs" "Character.cs 열기" _blank
-    click Camera href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Common/PlayerCameraController.cs" "PlayerCameraController.cs 열기" _blank
-    click HUD href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/HUDManager.cs" "HUDManager.cs 열기" _blank
+    click PlayerController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/PlayerController.cs" "PlayerController.cs 열기" _blank
+    click Pawn href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/Character.cs" "Character.cs 열기" _blank
+    click PlayerCameraController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Common/PlayerCameraController.cs" "PlayerCameraController.cs 열기" _blank
+    click HUDManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/HUDManager.cs" "HUDManager.cs 열기" _blank
 ```
 
 ### 캐릭터 내부 구성
@@ -120,79 +116,61 @@ flowchart LR
 ```mermaid
 ---
 config:
-  theme: base
-  themeVariables:
-    background: "#b8c7d9"
-    primaryColor: "#edf2f8"
-    primaryTextColor: "#1e293b"
-    primaryBorderColor: "#94a3b8"
-    lineColor: "#64748b"
-    secondaryColor: "#d6e0ed"
-    tertiaryColor: "#d6e0ed"
-    clusterBkg: "#d6e0ed"
-    clusterBorder: "#8da2ba"
-    titleColor: "#334155"
-    edgeLabelBackground: "#d6e0ed"
-  themeCSS: |
-    a, a:link, a:visited, a:hover, a:active, a:focus, a *,
-    .node a, .node a:link, .node a:visited, .node a:hover,
-    .node .nodeLabel, .node .nodeLabel *, .node text {
-      color: #1e293b !important;
-      fill: #1e293b !important;
-      text-decoration: none !important;
-      text-decoration-line: none !important;
-    }
+  class:
+    hideEmptyMembersBox: true
 ---
-flowchart TB
-    subgraph Character["Character / Pawn — 내부 구성"]
-        direction TB
-        Core["Pawn → Character<br/>컴포넌트 참조 · 빙의 / 빙의 해제"]
-        Core --- Motion
-        Core --- Gameplay
-        Core --- Targets
-
-        subgraph Motion["이동 · 애니메이션"]
-            direction TB
-            Movement["Movement Component<br/>이동 · 달리기 · 점프 · 회전"]
-            Animation["Animation Controller<br/>이동 상태 조회 · 애니메이션 갱신"]
-            Movement ~~~ Animation
-        end
-
-        subgraph Gameplay["스킬 · 버프 · 능력치"]
-            direction TB
-            Skills["Skill Manager / Skill<br/>스킬 보유 · 갱신"]
-            Buffs["Buff Manager / Buff<br/>지속 효과 · 수명 관리"]
-            Status["StatusInfo / Status<br/>현재 체력 · 기본 능력치"]
-            Skills ~~~ Buffs ~~~ Status
-        end
-
-        subgraph Targets["조준 · 카메라 · HUD 기준점"]
-            direction TB
-            Aim["Aim Target / Aim Rig<br/>조준 위치 · Rig 가중치"]
-            SpringArm["Spring Arm<br/>카메라 기준 위치 · 회전"]
-            Anchor["Widget Anchor<br/>이름 · 말풍선 · 체력바 기준점"]
-            Aim ~~~ SpringArm ~~~ Anchor
-        end
-    end
-
-    classDef default fill:#edf2f8,stroke:#8da2ba,color:#1e293b
-    classDef focus fill:#b9d3ef,stroke:#527fae,color:#1e293b,stroke-width:2px
-    class Core focus
-
-    style Character fill:#b8c7d9,stroke:#8da2ba,color:#1e293b
-    style Motion fill:#d6e0ed,stroke:#9bafc5,color:#1e293b
-    style Gameplay fill:#d6e0ed,stroke:#9bafc5,color:#1e293b
-    style Targets fill:#d6e0ed,stroke:#9bafc5,color:#1e293b
-
+classDiagram
+    direction TB
+    class Core["Pawn / Character"] {
+        컴포넌트 참조 · 빙의 / 빙의 해제
+    }
+    namespace 이동_애니메이션 {
+        class Movement {
+            이동 · 달리기 · 점프 · 회전
+        }
+        class CharacterAnimationController {
+            이동 상태 조회 · 애니메이션 갱신
+        }
+    }
+    namespace 스킬_버프_능력치 {
+        class SkillManager {
+            Skill 보유 · 갱신
+        }
+        class BuffManager {
+            Buff 지속 효과 · 수명 관리
+        }
+        class StatusInfo {
+            현재 체력 · Status 기본 능력치
+        }
+    }
+    namespace 조준_카메라_HUD_기준점 {
+        class AimTarget {
+            조준 위치 · Aim Rig 가중치
+        }
+        class SpringArm {
+            카메라 기준 위치 · 회전
+        }
+        class WidgetAnchor {
+            이름 · 말풍선 · 체력바 기준점
+        }
+    }
+    Core --> Movement : 이동 컴포넌트 참조
+    Core --> CharacterAnimationController : 애니메이션 참조
+    Core --> SkillManager : 스킬 관리
+    Core --> BuffManager : 버프 관리
+    Core --> StatusInfo : 능력치 보유
+    Core --> AimTarget : 조준 대상 참조
+    Core --> SpringArm : 하위 카메라 기준점
+    Core --> WidgetAnchor : HUD 기준점 참조
     click Core href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Pawn.cs" "Pawn.cs 열기" _blank
     click Movement href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Movement.cs" "Movement.cs 열기" _blank
-    click Animation href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/CharacterAnimationController.cs" "CharacterAnimationController.cs 열기" _blank
-    click Skills href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Skill/SkillManager.cs" "SkillManager.cs 열기" _blank
-    click Buffs href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Buff/BuffManager.cs" "BuffManager.cs 열기" _blank
-    click Status href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Status/StatusInfo.cs" "StatusInfo.cs 열기" _blank
-    click Aim href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/AimTarget.cs" "AimTarget.cs 열기" _blank
+    click CharacterAnimationController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/CharacterAnimationController.cs" "CharacterAnimationController.cs 열기" _blank
+    click SkillManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Skill/SkillManager.cs" "SkillManager.cs 열기" _blank
+    click BuffManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Buff/BuffManager.cs" "BuffManager.cs 열기" _blank
+    click StatusInfo href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Status/StatusInfo.cs" "StatusInfo.cs 열기" _blank
+    click AimTarget href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/AimTarget.cs" "AimTarget.cs 열기" _blank
     click SpringArm href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Common/SpringArm.cs" "SpringArm.cs 열기" _blank
-    click Anchor href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/WidgetAnchor.cs" "WidgetAnchor.cs 열기" _blank
+    click WidgetAnchor href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/WidgetAnchor.cs" "WidgetAnchor.cs 열기" _blank
 ```
 
 `GameMode`가 기본 `Pawn`의 빙의를 요청하면 컨트롤러의 공통 기반인 `PawnController`가 빙의 대상을 저장하고 입력을 활성화하며 카메라에 `SpringArm`을 연결합니다. `Character`는 빙의 시 조준 대상을 컨트롤러에 전달합니다. HUD 부착과 해제는 `Pawn`의 활성화와 비활성화에 따라 처리되며, HUD는 `WidgetAnchor`를 추적하고 오브젝트 풀을 통해 재사용됩니다.

@@ -93,6 +93,43 @@ namespace Game
         protected abstract void Initalize();
 
         /// <summary>
+        /// 장비 장착
+        /// </summary>
+        public void Equip(Equipment equipment)
+        {
+            if (equipmentList.Contains(equipment)) return;
+
+            switch (equipment)
+            {
+                case Weapon:
+                    {
+                        if (EquippedWeapon)
+                        {
+                            Unequip(EquippedWeapon);
+                        }
+
+                        EquippedWeapon = equipment as Weapon;
+                        equipmentList.Add(equipment);
+                    }
+                    break;
+                default:
+                    {
+                        equipmentList.Add(equipment);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 장비 해제
+        /// </summary>
+        /// <param name="equipment"></param>
+        public void Unequip(Equipment equipment)
+        {
+            equipmentList.Remove(equipment);
+        }
+
+        /// <summary>
         /// 플레이어 컨트롤러 빙의 시 파생 Pawn에서 사용할 처리 지점
         /// </summary>
         public virtual void Possess(PawnController pawnController)

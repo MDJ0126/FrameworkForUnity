@@ -1,3 +1,5 @@
+#pragma warning disable IDE0051 // Unity Animation Event에서 호출한다.
+
 namespace Game
 {
     public class RobotKyleAnimationController : CharacterAnimationController

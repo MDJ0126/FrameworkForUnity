@@ -1,6 +1,6 @@
 namespace Game
 {
-    public class TestSword : Weapon
+    public class TestSword : MeleeWeapon
     {
 
     }

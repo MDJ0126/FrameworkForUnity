@@ -17,23 +17,58 @@
 
 [프로젝트 다큐먼트 보기](https://mdj0126.github.io/SampleProjectForUnity/docs/documentation/index.html)
 
-## 2. 소개
+## 2. 이 프로젝트에서는 무엇을 확인할 수 있나요?
 
-프로젝트를 시작할 때 반복해서 사용하는 기능과 구조를 정리하고,  
-직접 구현하며 학습한 내용을 하나의 재사용 가능한 기반으로 만드는 프로젝트입니다.
-
-개인 프로젝트의 기반으로 사용하는 동시에 **샘플 코드 제출 및 기술 검토 자료**로도 활용합니다.  
-완성된 하나의 게임을 제공하는 저장소가 아니라, 기능별 구현과 설계 방식을 보여주는 데 목적이 있습니다.
+TPS 게임을 구성하는 주요 기능과, 이를 하나의 게임으로 연결하는 개발 구조를 살펴볼 수 있습니다. 개별 기능의 구현을 넘어, 게임 전반의 코드가 어떤 역할로 나뉘고 서로 어떻게 연결되는지 확인할 수 있도록 구성한 샘플 프로젝트입니다.
 
 기존 Unity 개발 경험을 통해 정립한 주요 패턴에 Unreal Engine의 장점을 접목해 개발하고 있습니다.
 
 [프로젝트 다운로드 (ZIP · 약 400MB)](https://github.com/MDJ0126/SampleProjectForUnity/archive/refs/heads/main.zip)
 
-## 3. 샘플 프로젝트 구조
+## 3. 캐릭터 · 컨트롤러 상속 및 구성 구조
 
-전체 연결과 캐릭터 내부 구성을 나누어 표시합니다. 전체 연결도에는 시스템 사이의 주요 연결만, 캐릭터 상세도에는 보유하거나 참조하는 구성 요소를 나열합니다.
+캐릭터와 컨트롤러의 상속 관계, 빙의를 통한 연결, 캐릭터를 구성하는 기능을 살펴볼 수 있습니다. 상속 관계는 아래에 별도로 표시하고, 연결도와 내부 구성도는 객체 사이의 참조와 기능별 구성을 보여줍니다.
 
-### 전체 연결
+### 캐릭터 · 컨트롤러 상속 관계
+
+```mermaid
+classDiagram
+    Actor <|-- Pawn
+    Pawn <|-- Character
+    Character <|-- RobotKyle
+    PawnController <|-- PlayerController
+    PawnController <|-- AIController
+    PlayerController <|-- RobotKylePlayerController
+    PawnController --> Pawn : 빙의 대상 참조 · 빙의 / 해제
+    class Actor {
+        공통 액터 기반
+    }
+    class Pawn {
+        빙의 가능한 대상 · 스킬 / 버프 / 능력치
+    }
+    class Character {
+        조준 대상 · 캐릭터 애니메이션 참조
+    }
+    class RobotKyle {
+        샘플 캐릭터 구현
+    }
+    class PawnController {
+        빙의 관리 · 입력 활성화 · 카메라 연결
+    }
+    class PlayerController {
+        플레이어 컨트롤러 기반
+    }
+    class AIController {
+        AI 컨트롤러 기반
+    }
+    class RobotKylePlayerController {
+        샘플 캐릭터 입력 처리
+    }
+```
+
+`Actor → Pawn → Character → RobotKyle`은 캐릭터의 상속 계층입니다. 컨트롤러는 별도의 `PawnController` 계층에서 파생되며, 캐릭터를 상속하는 대신 `Pawn`에 빙의하여 제어합니다.
+
+### 빙의 · 카메라 · HUD 연결
 
 ```mermaid
 ---
@@ -160,7 +195,7 @@ flowchart TB
     click Anchor href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/WidgetAnchor.cs" "WidgetAnchor.cs 열기" _blank
 ```
 
-`GameMode`가 기본 `Pawn`의 빙의를 요청하면 `PlayerController`가 이동 입력, 조준 대상과 카메라를 연결합니다. 카메라는 캐릭터 하위의 `SpringArm`을 기준으로 움직이며, HUD는 `WidgetAnchor`를 추적하고 오브젝트 풀을 통해 재사용됩니다.
+`GameMode`가 기본 `Pawn`의 빙의를 요청하면 컨트롤러의 공통 기반인 `PawnController`가 빙의 대상을 저장하고 입력을 활성화하며 카메라에 `SpringArm`을 연결합니다. `Character`는 빙의 시 조준 대상을 컨트롤러에 전달합니다. HUD 부착과 해제는 `Pawn`의 활성화와 비활성화에 따라 처리되며, HUD는 `WidgetAnchor`를 추적하고 오브젝트 풀을 통해 재사용됩니다.
 
 ## 4. 개발된 기능
 

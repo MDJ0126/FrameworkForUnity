@@ -25,11 +25,11 @@ TPS 게임을 구성하는 주요 기능과, 이를 하나의 게임으로 연�
 
 [프로젝트 다운로드 (ZIP · 약 400MB)](https://github.com/MDJ0126/SampleProjectForUnity/archive/refs/heads/main.zip)
 
-## 3. 캐릭터 · 컨트롤러 상속 및 구성 구조
+## 3. 캐릭터 및 컨트롤러 상속 관계
 
 캐릭터와 컨트롤러의 상속 관계, 캐릭터에 연결된 기능별 구성을 살펴볼 수 있습니다. 상속 관계와 내부 구성을 나누어 표시합니다.
 
-### 캐릭터 · 컨트롤러 상속 관계
+### 캐릭터 및 컨트롤러 다이어그램
 
 ```mermaid
 ---
@@ -57,6 +57,7 @@ flowchart TB
 ```
 
 `Actor → Pawn → Character → RobotKyle`은 캐릭터의 상속 계층입니다. 컨트롤러는 별도의 `PawnController` 계층에서 파생되며, 캐릭터를 상속하는 대신 `Pawn`에 빙의하여 제어합니다.
+(`RobotKyle`은 `Character`를 상속받은 예제 캐릭터입니다.)
 
 ### 캐릭터 내부 구성
 
@@ -76,7 +77,7 @@ flowchart TB
 - **StatusInfo**: 현재 체력 · 기본 능력치\
   [StatusInfo.cs](Assets/Scripts/InGame/Status/StatusInfo.cs)
 
-## 4. 개발된 기능
+## 4. 개발된 기능 상세보기
 
 ### 캐릭터 · 플레이어 제어
 

@@ -27,141 +27,61 @@ TPS 게임을 구성하는 주요 기능과, 이를 하나의 게임으로 연�
 
 ## 3. 캐릭터 · 컨트롤러 상속 및 구성 구조
 
-캐릭터와 컨트롤러의 상속 관계, 빙의를 통한 연결, 캐릭터를 구성하는 기능을 살펴볼 수 있습니다. 상속 관계는 아래에 별도로 표시하고, 연결도와 내부 구성도는 객체 사이의 참조와 기능별 구성을 보여줍니다.
+캐릭터와 컨트롤러의 상속 관계, 캐릭터에 연결된 기능별 구성을 살펴볼 수 있습니다. 상속 관계와 내부 구성을 나누어 표시합니다.
 
 ### 캐릭터 · 컨트롤러 상속 관계
 
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    Actor <|-- Pawn
-    Pawn <|-- Character
-    Character <|-- RobotKyle
-    PawnController <|-- PlayerController
-    PawnController <|-- AIController
-    PlayerController <|-- RobotKylePlayerController
-    PawnController --> Pawn : 빙의 대상 참조 · 빙의 / 해제
-    class Actor {
-        공통 액터 기반
-    }
-    class Pawn {
-        빙의 가능한 대상 · 스킬 / 버프 / 능력치
-    }
-    class Character {
-        조준 대상 · 캐릭터 애니메이션 참조
-    }
-    class RobotKyle {
-        샘플 캐릭터 구현
-    }
-    class PawnController {
-        빙의 관리 · 입력 활성화 · 카메라 연결
-    }
-    class PlayerController {
-        플레이어 컨트롤러 기반
-    }
-    class AIController {
-        AI 컨트롤러 기반
-    }
-    class RobotKylePlayerController {
-        샘플 캐릭터 입력 처리
-    }
+flowchart TB
+    Pawn -->|상속| Actor
+    Character -->|상속| Pawn
+    RobotKyle -->|상속| Character
+    PlayerController -->|상속| PawnController
+    AIController -->|상속| PawnController
+    RobotKylePlayerController -->|상속| PlayerController
+    PawnController -->|빙의 대상 참조 · 빙의 / 해제| Pawn
+    Actor["<b>Actor</b><hr/>공통 액터 기반"]
+    Pawn["<b>Pawn</b><hr/>빙의 가능한 대상 · 스킬 / 버프 / 능력치"]
+    Character["<b>Character</b><hr/>조준 대상 · 캐릭터 애니메이션 참조"]
+    RobotKyle["<b>RobotKyle</b><hr/>샘플 캐릭터 구현"]
+    PawnController["<b>PawnController</b><hr/>빙의 관리 · 입력 활성화 · 카메라 연결"]
+    PlayerController["<b>PlayerController</b><hr/>플레이어 컨트롤러 기반"]
+    AIController["<b>AIController</b><hr/>AI 컨트롤러 기반"]
+    RobotKylePlayerController["<b>RobotKylePlayerController</b><hr/>샘플 캐릭터 입력 처리"]
 ```
 
 `Actor → Pawn → Character → RobotKyle`은 캐릭터의 상속 계층입니다. 컨트롤러는 별도의 `PawnController` 계층에서 파생되며, 캐릭터를 상속하는 대신 `Pawn`에 빙의하여 제어합니다.
 
-### 빙의 · 카메라 · HUD 연결
-
-```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    GameMode --> PlayerController : 기본 Pawn 빙의 요청
-    PlayerController --> Pawn : 빙의 · 입력 전달
-    PlayerController --> PlayerCameraController : SpringArm 연결
-    Pawn --> HUDManager : 활성화 / 비활성화 시 HUD 부착 / 해제
-    class GameMode {
-        기본 Pawn 빙의 요청
-    }
-    class PlayerController {
-        PawnController 기반 빙의 관리 · 파생 클래스 입력 처리
-    }
-    class Pawn {
-        Character의 기반 · 빙의 대상
-    }
-    class PlayerCameraController {
-        궤도 회전 · 장애물 대응
-    }
-    class HUDManager {
-        Object Pool · 월드 추적 HUD
-    }
-    click GameMode href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Management/GameMode.cs" "GameMode.cs 열기" _blank
-    click PlayerController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/PlayerController.cs" "PlayerController.cs 열기" _blank
-    click Pawn href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/Character.cs" "Character.cs 열기" _blank
-    click PlayerCameraController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Common/PlayerCameraController.cs" "PlayerCameraController.cs 열기" _blank
-    click HUDManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/HUDManager.cs" "HUDManager.cs 열기" _blank
-```
-
 ### 캐릭터 내부 구성
 
-`Pawn`을 상속하는 `Character`를 기준으로 묶었습니다. 아래 박스의 배치는 실행 순서가 아니라 기능별 구성 목록입니다.
+`Pawn / Character`에 연결된 구성 요소를 세로로 나열합니다. 이동·애니메이션 컴포넌트, 스킬·버프·능력치 관리 객체, 조준·카메라·HUD 기준점을 기능별로 묶었습니다. 연결선은 캐릭터의 보유·참조 관계를 나타내며, 위아래 배치는 실행 순서를 의미하지 않습니다.
 
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
+flowchart TB
+    Core["<b>Pawn / Character</b><hr/>컴포넌트 참조 · 빙의 / 빙의 해제"]
+    Core -->|컴포넌트 및 관리 객체 보유 · 기준점 참조| Components
+    subgraph Components["캐릭터 구성 요소"]
     direction TB
-    class Core["Pawn / Character"] {
-        컴포넌트 참조 · 빙의 / 빙의 해제
-    }
-    namespace 이동_애니메이션 {
-        class Movement {
-            이동 · 달리기 · 점프 · 회전
-        }
-        class CharacterAnimationController {
-            이동 상태 조회 · 애니메이션 갱신
-        }
-    }
-    namespace 스킬_버프_능력치 {
-        class SkillManager {
-            Skill 보유 · 갱신
-        }
-        class BuffManager {
-            Buff 지속 효과 · 수명 관리
-        }
-        class StatusInfo {
-            현재 체력 · Status 기본 능력치
-        }
-    }
-    namespace 조준_카메라_HUD_기준점 {
-        class AimTarget {
-            조준 위치 · Aim Rig 가중치
-        }
-        class SpringArm {
-            카메라 기준 위치 · 회전
-        }
-        class WidgetAnchor {
-            이름 · 말풍선 · 체력바 기준점
-        }
-    }
-    Core --> Movement : 이동 컴포넌트 참조
-    Core --> CharacterAnimationController : 애니메이션 참조
-    Core --> SkillManager : 스킬 관리
-    Core --> BuffManager : 버프 관리
-    Core --> StatusInfo : 능력치 보유
-    Core --> AimTarget : 조준 대상 참조
-    Core --> SpringArm : 하위 카메라 기준점
-    Core --> WidgetAnchor : HUD 기준점 참조
+    subgraph 이동_애니메이션["이동 · 애니메이션"]
+        direction TB
+        Movement["<b>Movement</b><hr/>이동 · 달리기 · 점프 · 회전"]
+        CharacterAnimationController["<b>CharacterAnimationController</b><hr/>이동 상태 조회 · 애니메이션 갱신"]
+    end
+    subgraph 스킬_버프_능력치["스킬 · 버프 · 능력치"]
+        direction TB
+        SkillManager["<b>SkillManager</b><hr/>Skill 보유 · 갱신"]
+        BuffManager["<b>BuffManager</b><hr/>Buff 지속 효과 · 수명 관리"]
+        StatusInfo["<b>StatusInfo</b><hr/>현재 체력 · Status 기본 능력치"]
+    end
+    subgraph 조준_카메라_HUD_기준점["조준 · 카메라 · HUD · 기준점"]
+        direction TB
+        AimTarget["<b>AimTarget</b><hr/>조준 위치 · Aim Rig 가중치"]
+        SpringArm["<b>SpringArm</b><hr/>카메라 기준 위치 · 회전"]
+        WidgetAnchor["<b>WidgetAnchor</b><hr/>이름 · 말풍선 · 체력바 기준점"]
+    end
+    %% 투명 연결선으로 세로 배치만 지정한다.
+    Movement ~~~ CharacterAnimationController ~~~ SkillManager ~~~ BuffManager ~~~ StatusInfo ~~~ AimTarget ~~~ SpringArm ~~~ WidgetAnchor
+    end
     click Core href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Pawn.cs" "Pawn.cs 열기" _blank
     click Movement href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Movement.cs" "Movement.cs 열기" _blank
     click CharacterAnimationController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/CharacterAnimationController.cs" "CharacterAnimationController.cs 열기" _blank
@@ -173,7 +93,6 @@ classDiagram
     click WidgetAnchor href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/WidgetAnchor.cs" "WidgetAnchor.cs 열기" _blank
 ```
 
-`GameMode`가 기본 `Pawn`의 빙의를 요청하면 컨트롤러의 공통 기반인 `PawnController`가 빙의 대상을 저장하고 입력을 활성화하며 카메라에 `SpringArm`을 연결합니다. `Character`는 빙의 시 조준 대상을 컨트롤러에 전달합니다. HUD 부착과 해제는 `Pawn`의 활성화와 비활성화에 따라 처리되며, HUD는 `WidgetAnchor`를 추적하고 오브젝트 풀을 통해 재사용됩니다.
 
 ## 4. 개발된 기능
 

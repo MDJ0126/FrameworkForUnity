@@ -54,45 +54,21 @@ flowchart TB
 
 ### 캐릭터 내부 구성
 
-`Pawn / Character`에 연결된 구성 요소를 세로로 나열합니다. 이동·애니메이션 컴포넌트, 스킬·버프·능력치 관리 객체, 조준·카메라·HUD 기준점을 기능별로 묶었습니다. 연결선은 캐릭터의 보유·참조 관계를 나타내며, 위아래 배치는 실행 순서를 의미하지 않습니다.
+`Pawn / Character`가 보유하거나 참조하는 구성 요소를 기능별로 묶었습니다. 아래 배치는 실행 순서를 의미하지 않습니다.
 
 ```mermaid
+---
+config:
+  flowchart:
+    htmlLabels: true
+    rankSpacing: 20
+    wrappingWidth: 600
+---
 flowchart TB
-    Core["<b>Pawn / Character</b><hr/>컴포넌트 참조 · 빙의 / 빙의 해제"]
-    Core -->|컴포넌트 및 관리 객체 보유 · 기준점 참조| Components
-    subgraph Components["캐릭터 구성 요소"]
-    direction TB
-    subgraph 이동_애니메이션["이동 · 애니메이션"]
-        direction TB
-        Movement["<b>Movement</b><hr/>이동 · 달리기 · 점프 · 회전"]
-        CharacterAnimationController["<b>CharacterAnimationController</b><hr/>이동 상태 조회 · 애니메이션 갱신"]
-    end
-    subgraph 스킬_버프_능력치["스킬 · 버프 · 능력치"]
-        direction TB
-        SkillManager["<b>SkillManager</b><hr/>Skill 보유 · 갱신"]
-        BuffManager["<b>BuffManager</b><hr/>Buff 지속 효과 · 수명 관리"]
-        StatusInfo["<b>StatusInfo</b><hr/>현재 체력 · Status 기본 능력치"]
-    end
-    subgraph 조준_카메라_HUD_기준점["조준 · 카메라 · HUD · 기준점"]
-        direction TB
-        AimTarget["<b>AimTarget</b><hr/>조준 위치 · Aim Rig 가중치"]
-        SpringArm["<b>SpringArm</b><hr/>카메라 기준 위치 · 회전"]
-        WidgetAnchor["<b>WidgetAnchor</b><hr/>이름 · 말풍선 · 체력바 기준점"]
-    end
-    %% 투명 연결선으로 세로 배치만 지정한다.
-    Movement ~~~ CharacterAnimationController ~~~ SkillManager ~~~ BuffManager ~~~ StatusInfo ~~~ AimTarget ~~~ SpringArm ~~~ WidgetAnchor
-    end
-    click Core href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Pawn.cs" "Pawn.cs 열기" _blank
-    click Movement href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Movement.cs" "Movement.cs 열기" _blank
-    click CharacterAnimationController href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/CharacterAnimationController.cs" "CharacterAnimationController.cs 열기" _blank
-    click SkillManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Skill/SkillManager.cs" "SkillManager.cs 열기" _blank
-    click BuffManager href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Buff/BuffManager.cs" "BuffManager.cs 열기" _blank
-    click StatusInfo href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Status/StatusInfo.cs" "StatusInfo.cs 열기" _blank
-    click AimTarget href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/InGame/Object/Pawn/Character/AimTarget.cs" "AimTarget.cs 열기" _blank
-    click SpringArm href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/Common/SpringArm.cs" "SpringArm.cs 열기" _blank
-    click WidgetAnchor href "https://github.com/MDJ0126/SampleProjectForUnity/blob/main/Assets/Scripts/UI/HUD/WidgetAnchor.cs" "WidgetAnchor.cs 열기" _blank
+    Core["<b>Pawn / Character</b><hr/>구성 요소 보유 · 참조"]
+    Core -->|컴포넌트 · 관리 객체 · 기준점 연결| Components
+    Components["<b>이동 · 애니메이션</b><br/>Movement — 이동 · 달리기 · 점프 · 회전<br/>CharacterAnimationController — 이동 상태 반영 · 애니메이션 갱신<hr/><b>스킬 · 버프 · 능력치</b><br/>SkillManager — 스킬 보유 · 갱신<br/>BuffManager — 지속 효과 · 수명 관리<br/>StatusInfo — 현재 체력 · 기본 능력치<hr/><b>조준 · 카메라 · HUD 기준점</b><br/>AimTarget — 조준 위치 · Rig 가중치<br/>SpringArm — 카메라 기준 위치 · 회전<br/>WidgetAnchor — 이름 · 말풍선 · 체력바 기준점"]
 ```
-
 
 ## 4. 개발된 기능
 

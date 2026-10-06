@@ -32,43 +32,41 @@ TPS 게임을 구성하는 주요 기능과, 이를 하나의 게임으로 연�
 ### 캐릭터 · 컨트롤러 상속 관계
 
 ```mermaid
-flowchart TB
-    Pawn -->|상속| Actor
-    Character -->|상속| Pawn
-    RobotKyle -->|상속| Character
-    PlayerController -->|상속| PawnController
-    AIController -->|상속| PawnController
-    RobotKylePlayerController -->|상속| PlayerController
-    PawnController -->|빙의 대상 참조 · 빙의 / 해제| Pawn
-    Actor["<b>Actor</b><hr/>공통 액터 기반"]
-    Pawn["<b>Pawn</b><hr/>빙의 가능한 대상 · 스킬 / 버프 / 능력치"]
-    Character["<b>Character</b><hr/>조준 대상 · 캐릭터 애니메이션 참조"]
-    RobotKyle["<b>RobotKyle</b><hr/>샘플 캐릭터 구현"]
-    PawnController["<b>PawnController</b><hr/>빙의 관리 · 입력 활성화 · 카메라 연결"]
-    PlayerController["<b>PlayerController</b><hr/>플레이어 컨트롤러 기반"]
-    AIController["<b>AIController</b><hr/>AI 컨트롤러 기반"]
-    RobotKylePlayerController["<b>RobotKylePlayerController</b><hr/>샘플 캐릭터 입력 처리"]
+---
+config:
+  class:
+    htmlLabels: true
+    hideEmptyMembersBox: true
+---
+classDiagram
+    Actor <|-- Pawn
+    Pawn <|-- Character
+    Character <|-- RobotKyle
+    PawnController <|-- PlayerController
+    PawnController <|-- AIController
+    PlayerController <|-- RobotKylePlayerController
+    PawnController --> Pawn : 빙의 대상 참조 · 빙의 / 해제
+    class Actor["<br/><b>Actor</b><hr/><span style='font-weight:normal'>공통 액터 기반</span>"]
+    class Pawn["<br/><b>Pawn</b><hr/><span style='font-weight:normal'>빙의 가능한 대상 · 스킬 / 버프 / 능력치</span>"]
+    class Character["<br/><b>Character</b><hr/><span style='font-weight:normal'>조준 대상 · 캐릭터 애니메이션 참조</span>"]
+    class RobotKyle["<br/><b>RobotKyle</b><hr/><span style='font-weight:normal'>샘플 캐릭터 구현</span>"]
+    class PawnController["<br/><b>PawnController</b><hr/><span style='font-weight:normal'>빙의 관리 · 입력 활성화 · 카메라 연결</span>"]
+    class PlayerController["<br/><b>PlayerController</b><hr/><span style='font-weight:normal'>플레이어 컨트롤러 기반</span>"]
+    class AIController["<br/><b>AIController</b><hr/><span style='font-weight:normal'>AI 컨트롤러 기반</span>"]
+    class RobotKylePlayerController["<br/><b>RobotKylePlayerController</b><hr/><span style='font-weight:normal'>샘플 캐릭터 입력 처리</span>"]
 ```
 
 `Actor → Pawn → Character → RobotKyle`은 캐릭터의 상속 계층입니다. 컨트롤러는 별도의 `PawnController` 계층에서 파생되며, 캐릭터를 상속하는 대신 `Pawn`에 빙의하여 제어합니다.
 
 ### 캐릭터 내부 구성
 
-`Pawn / Character`가 보유하거나 참조하는 구성 요소를 기능별로 묶었습니다. 아래 배치는 실행 순서를 의미하지 않습니다.
-
-```mermaid
----
-config:
-  flowchart:
-    htmlLabels: true
-    rankSpacing: 20
-    wrappingWidth: 600
----
-flowchart TB
-    Core["<b>Pawn / Character</b><hr/>구성 요소 보유 · 참조"]
-    Core -->|컴포넌트 · 관리 객체 · 기준점 연결| Components
-    Components["<b>이동 · 애니메이션</b><br/>Movement — 이동 · 달리기 · 점프 · 회전<br/>CharacterAnimationController — 이동 상태 반영 · 애니메이션 갱신<hr/><b>스킬 · 버프 · 능력치</b><br/>SkillManager — 스킬 보유 · 갱신<br/>BuffManager — 지속 효과 · 수명 관리<br/>StatusInfo — 현재 체력 · 기본 능력치<hr/><b>조준 · 카메라 · HUD 기준점</b><br/>AimTarget — 조준 위치 · Rig 가중치<br/>SpringArm — 카메라 기준 위치 · 회전<br/>WidgetAnchor — 이름 · 말풍선 · 체력바 기준점"]
-```
+| 기능 구분 | 구성 요소 | 역할 |
+| --- | --- | --- |
+| **이동 · 애니메이션** | Movement | 이동 · 달리기 · 점프 · 회전 |
+| | CharacterAnimationController | 이동 상태 반영 · 애니메이션 갱신 |
+| **스킬 · 버프 · 능력치** | SkillManager | 스킬 보유 · 갱신 |
+| | BuffManager | 지속 효과 · 수명 관리 |
+| | StatusInfo | 현재 체력 · 기본 능력치 |
 
 ## 4. 개발된 기능
 

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8188769606434217005}
   - component: {fileID: 6828574070216955353}
+  - component: {fileID: 772200001}
   m_Layer: 0
   m_Name: TestSword
   m_TagString: Untagged
@@ -46,6 +47,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitBox: {fileID: 193415196582228634}
+  weaponRibbon: {fileID: 772200001}
+--- !u!114 &772200001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1318904549476743261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75e92897286245cb8cd49397deaf1de9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  bladeSource: {fileID: 3897566101801513363}
+  bladeStart: {fileID: 0}
+  bladeEnd: {fileID: 0}
+  bladeStartFraction: 0.25
+  ribbonMaterial: {fileID: 2100000, guid: 7ce63d18862f4516bb042c83571dc2fe, type: 2}
+  ribbonColor: {r: 0.3, g: 1.3, b: 2, a: 0.8}
+  lifetime: 0.16
+  minimumDistance: 0.008
+  breakDistance: 2
+  maxSamples: 96
 --- !u!1001 &5585199018564543770
 PrefabInstance:
   m_ObjectHideFlags: 0

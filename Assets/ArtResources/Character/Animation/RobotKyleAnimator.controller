@@ -123,6 +123,9 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
+    m_ConditionEvent: IsMelee
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
     m_ConditionEvent: Attack
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
@@ -394,7 +397,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 0}
+  m_Motion: {fileID: -57794709565900691, guid: 84781f800961561439ffe31c702436b5, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -774,7 +777,7 @@ AnimatorStateMachine:
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: -120, y: -70, z: 0}
+  m_AnyStatePosition: {x: -150, y: 10, z: 0}
   m_EntryPosition: {x: -130, y: 120, z: 0}
   m_ExitPosition: {x: -130, y: 220, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}

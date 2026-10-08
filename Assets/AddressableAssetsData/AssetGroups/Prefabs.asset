@@ -20,6 +20,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 550b20c3d776ab44aa011ebc21ed97dd
+    m_Address: Assets/AddressablesResources/Prefabs/Weapon/TestAK74.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f52f27ef25559147b52e63fbe9e8cdd
+    m_Address: Assets/AddressablesResources/Prefabs/Weapon/TestSword.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8f3aef180b6e2ad448f2b735d8ea59d0
     m_Address: Assets/AddressablesResources/Prefabs/HUD/FollowSpeechBubble.prefab
     m_ReadOnly: 0

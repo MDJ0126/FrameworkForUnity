@@ -8,14 +8,15 @@ namespace Game
         public Socket rightHandleSocket;
 
         #endregion
+
         public override string Name => nameof(RobotKyle);
 
         public RobotKyleAnimationController RobotKyleAnimationController { get; private set; }
 
         protected override void Awake()
         {
-            base.Awake();
             RobotKyleAnimationController = GetComponentInChildren<RobotKyleAnimationController>();
+            base.Awake();
         }
 
         protected override void Start()
@@ -29,6 +30,11 @@ namespace Game
             Status status = StatusTable.Instance.GetData(0);
             StatusInfo.baseStatus += status;
             StatusInfo.Initialize();
+
+            if (EquippedWeapon != null)
+            {
+                RobotKyleAnimationController.SetWeaponAnimation(isMelee: EquippedWeapon is MeleeWeapon);
+            }
         }
 
         protected override void DamagerProcess(Pawn attacker, DamageInfo damageInfo)

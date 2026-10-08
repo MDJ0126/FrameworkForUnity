@@ -1,52 +1,19 @@
-using System.Collections.Generic;
-
 namespace Game
 {
     public abstract class Weapon : Equipment
     {
-        public HitBox hitBox;
-        private List<Pawn> _hittedPawns = new();
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (hitBox)
-            {
-                hitBox.OnHit += OnHit;
-            }
-            hitBox.enabled = false;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            if (hitBox)
-            {
-                hitBox.OnHit -= OnHit;
-            }
-        }
-
+        /// <summary>
+        /// 무기별 공격 처리를 시작한다.
+        /// </summary>
         public virtual void StartAttack()
         {
-            _hittedPawns.Clear();
-            hitBox.enabled = true;
         }
 
+        /// <summary>
+        /// 무기별 공격 처리를 종료한다.
+        /// </summary>
         public virtual void EndAttack()
         {
-            hitBox.enabled = false;
-        }
-
-        private void OnHit(HitBox myHitBox, HitBox otherHitBox)
-        {
-            if (otherHitBox.Role == HitBox.eHitBoxRole.Hurt)
-            {
-                if (!_hittedPawns.Contains(otherHitBox.Owner))
-                {
-                    _hittedPawns.Add(otherHitBox.Owner);
-                    otherHitBox.Owner.Damaged(Owner, new DamageInfo { damage = Owner.StatusInfo.baseStatus.damage });
-                }
-            }
         }
     }
 }

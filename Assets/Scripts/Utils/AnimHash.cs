@@ -11,4 +11,5 @@ public static class AnimHash
     public static int Attack = Animator.StringToHash("Attack");
     public static int IsSprint = Animator.StringToHash("IsSprint");
     public static int Hit = Animator.StringToHash("Hit");
+    public static int IsMelee = Animator.StringToHash("IsMelee");
 }

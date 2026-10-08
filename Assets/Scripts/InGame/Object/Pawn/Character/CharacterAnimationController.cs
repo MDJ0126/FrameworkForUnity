@@ -17,7 +17,6 @@ namespace Game
             base.Awake();
             _character = GetComponentInParent<Character>();
             _movement = _character.GetComponent<Movement>();
-            boneAnimator = GetComponent<Animator>();
             _groundLayer = LayerMask.GetMask("Ground");
         }
 
